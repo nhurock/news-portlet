@@ -10,7 +10,8 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<b><c:out value="${news.title}"/></b>
-<c:out value="${news.date}"/>
+<b><%--@elvariable id="news" type="ru.news.model.JournalArticleDTO"--%>
+<c:out value="${news.title}"/></b>
+<c:out value="${news.publishDate}"/>
 <br>
 <c:out value="${news.content}"  escapeXml="false"/>
