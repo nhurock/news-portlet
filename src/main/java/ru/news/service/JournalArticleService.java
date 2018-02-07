@@ -8,5 +8,5 @@ public interface JournalArticleService {
 
     List<JournalArticleDTO> getJournalArticlesLatestVersion();
 
-    JournalArticleDTO getJournalArticleLatestVersion (long groupId, String articleId);
+    JournalArticleDTO getJournalArticleLatestVersion(long groupId, String articleId);
 }

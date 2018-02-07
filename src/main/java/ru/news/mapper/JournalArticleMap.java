@@ -3,17 +3,15 @@ package ru.news.mapper;
 import com.liferay.portlet.journal.model.JournalArticle;
 import ru.news.model.JournalArticleDTO;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 public class JournalArticleMap {
 
     private static final Locale LOCALE = Locale.ENGLISH;
     private static final String LANGUAGE_ID = "en_US";
-    private static final Integer WORD_COUNT = 50;
-    private static final Integer SENTENCE_COUNT = 2;
-    private static final SimpleDateFormat DATE_FORMAT_LONG = new SimpleDateFormat("dd.MM.YYYY 'at' HH:mm:ss");
-    private static final SimpleDateFormat DATE_FORMAT_SHORT = new SimpleDateFormat("dd.MM.YYYY");
 
     public static JournalArticleDTO toDto(JournalArticle journalArticle) {
 
@@ -29,12 +27,7 @@ public class JournalArticleMap {
         String content = SAXMap.getContent(xmlContentByLocale);
 
         journalArticleDTO.setContent(content);
-
-//        journalArticleDTO.setPreviewContent(substring(content, WORD_COUNT));
-
-        Date createDate = journalArticle.getCreateDate();
-
-        journalArticleDTO.setDate(DATE_FORMAT_SHORT.format(createDate));
+        journalArticleDTO.setPublishDate(journalArticle.getCreateDate());
 
         return journalArticleDTO;
     }
@@ -46,7 +39,6 @@ public class JournalArticleMap {
         for (JournalArticle journalArticle : journalArticles) {
             journalArticleDTOS.add(toDto(journalArticle));
         }
-
         return journalArticleDTOS;
     }
 
@@ -66,21 +58,4 @@ public class JournalArticleMap {
         }
         return String.valueOf(stringBuffer);
     }
-
-
-    // TODO: решить проблему корректного отображения предложений.
-   /* private static String subSentence(String message, Integer sentence) {
-        String s = message;
-        int indexEndOfSentence = 0;
-        for (int i = 0; i < sentence; i++) {
-            indexEndOfSentence = s.indexOf(".");
-//            System.out.println("index =" + indexEndOfSentence + " " + s.substring(indexEndOfSentence, s.length()));
-//            System.out.println(indexEndOfSentence + "  " + s.length() + "  " + substring(s, 30));
-            s = s.substring(indexEndOfSentence+2, s.length());
-//            System.out.println(indexEndOfSentence + "  " + s.length() + "  " + substring(s, 30));
-        }
-//        System.out.println(indexEndOfSentence);
-
-        return message.substring(0, indexEndOfSentence-1);
-    }*/
 }

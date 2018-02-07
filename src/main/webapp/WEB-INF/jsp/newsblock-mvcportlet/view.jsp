@@ -18,15 +18,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
-<%--This is the <b>newsblock-mvcportlet</b> portlet.<br />--%>
-<%--<c:out escapeXml="true" value="${releaseInfo}" />.--%>
-
-<%--<c:out escapeXml="true" value="${newsList}" />.--%>
-
-<%--<jsp:useBean id="newsList" scope="request" type="java.util.List"/>--%>
-
-
-
+<%--@elvariable id="newsList" type="java.util.List"--%>
 <c:forEach var="news" items="${newsList}" varStatus="loop">
 
     <portlet:renderURL  var="getViewNewsURL" windowState="normal">
@@ -37,7 +29,7 @@
 
     <a href="<%=getViewNewsURL%>"><b><c:out value="${news.title}"/></b></a>
 
-    <c:out value="${news.date}"/>
+    <c:out value="${news.publishDate}"/>
     <br>
     <c:out value="${news.content}"  escapeXml="false"/>
 

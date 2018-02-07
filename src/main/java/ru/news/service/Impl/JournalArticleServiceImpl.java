@@ -10,7 +10,9 @@ import ru.news.mapper.JournalArticleMap;
 import ru.news.model.JournalArticleDTO;
 import ru.news.service.JournalArticleService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class JournalArticleServiceImpl implements JournalArticleService {
@@ -18,7 +20,7 @@ public class JournalArticleServiceImpl implements JournalArticleService {
     @Override
     public List<JournalArticleDTO> getJournalArticlesLatestVersion() {
         List<JournalArticleDTO> journalArticleDTOS = JournalArticleMap.toDto(getLatestVersionJA());
-        Collections.sort(journalArticleDTOS, new JournalArticleDTOComparator());
+        journalArticleDTOS.sort(new JournalArticleDTOComparator().reversed());
         return journalArticleDTOS;
     }
 
@@ -52,8 +54,7 @@ public class JournalArticleServiceImpl implements JournalArticleService {
         } catch (SystemException e) {
             e.printStackTrace();
         }
-        ArrayList<JournalArticle> journalArticles = new ArrayList<>(journalArticleHashMap.values());
-        return journalArticles;
+        return new ArrayList<>(journalArticleHashMap.values());
     }
 
 }

@@ -1,21 +1,6 @@
-/**
- * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
- * <p>
- * This library is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2.1 of the License, or (at your option)
- * any later version.
- * <p>
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
- */
-
 package ru.news;
 
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,9 +50,7 @@ public class PortletViewController {
     }
 
     @RenderMapping(params = "action=renderOne")
-    public String renderOneMethod(RenderRequest request, RenderResponse response, Model model){
-
-//        model.addAttribute("parameter", request.getParameter("parameter"));
+    public String renderOneMethod(RenderRequest request, RenderResponse response, Model model) {
 
         long groupId = Long.parseLong(request.getParameter("groupId"));
         String article = request.getParameter("articleId");
