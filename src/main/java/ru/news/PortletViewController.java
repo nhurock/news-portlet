@@ -49,8 +49,8 @@ public class PortletViewController {
         return "newsblock-mvcportlet/view";
     }
 
-    @RenderMapping(params = "action=renderOne")
-    public String renderOneMethod(RenderRequest request, RenderResponse response, Model model) {
+    @RenderMapping(params = "action=renderSingleNews")
+    public String renderSingleNewsView(RenderRequest request, RenderResponse response, Model model) {
 
         long groupId = Long.parseLong(request.getParameter("groupId"));
         String article = request.getParameter("articleId");
@@ -58,6 +58,28 @@ public class PortletViewController {
 
         model.addAttribute("news", journalArticleDTO);
         return "newsblock-mvcportlet/news";
+    }
+
+    @RenderMapping(params = "action=renderTagView")
+    public String renderTagView(RenderRequest request, RenderResponse response, Model model) {
+        String tag = request.getParameter("tag");
+
+        List<JournalArticleDTO> journalArticlesByTag = journalArticleService.getJournalArticleByTag(tag);
+
+        model.addAttribute("newsList", journalArticlesByTag);
+        model.addAttribute("tag", tag);
+        return "newsblock-mvcportlet/view";
+    }
+
+    @RenderMapping(params = "action=renderCategoryView")
+    public String renderCategoryView(RenderRequest request, RenderResponse response, Model model) {
+        String category = request.getParameter("category");
+
+        List<JournalArticleDTO> journalArticlesByTag = journalArticleService.getJournalArticleByCategory(category);
+
+        model.addAttribute("newsList", journalArticlesByTag);
+        model.addAttribute("category", category);
+        return "newsblock-mvcportlet/view";
     }
 
 }

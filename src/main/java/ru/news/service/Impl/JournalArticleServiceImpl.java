@@ -30,6 +30,30 @@ public class JournalArticleServiceImpl implements JournalArticleService {
         return JournalArticleMap.toDto(latestVersion);
     }
 
+    @Override
+    public List<JournalArticleDTO> getJournalArticleByTag(String tag) {
+        List<JournalArticleDTO> journalArticleDTOS = getJournalArticlesLatestVersion();
+        List<JournalArticleDTO> articleDTOListWithTag = new ArrayList<>();
+        for (JournalArticleDTO journalArticleDTO : journalArticleDTOS) {
+            if (journalArticleDTO.getTags().contains(tag)) {
+                articleDTOListWithTag.add(journalArticleDTO);
+            }
+        }
+        return articleDTOListWithTag;
+    }
+
+    @Override
+    public List<JournalArticleDTO> getJournalArticleByCategory(String category) {
+        List<JournalArticleDTO> journalArticleDTOS = getJournalArticlesLatestVersion();
+        List<JournalArticleDTO> articleDTOListWithCategory = new ArrayList<>();
+        for (JournalArticleDTO journalArticleDTO : journalArticleDTOS) {
+            if (journalArticleDTO.getCategory().contains(category)) {
+                articleDTOListWithCategory.add(journalArticleDTO);
+            }
+        }
+        return articleDTOListWithCategory;
+    }
+
     private JournalArticle getLatestVersion(long groupId, String articleId) {
         double latestVersion;
         JournalArticle journalArticle = null;
