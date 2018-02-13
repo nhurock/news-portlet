@@ -71,8 +71,11 @@ public class JournalArticleServiceImpl implements JournalArticleService {
         try {
             for (JournalArticle journalArticle : JournalArticleLocalServiceUtil.getArticles()) {
                 String articleId = journalArticle.getArticleId();
-                if (!journalArticleHashMap.containsKey(articleId)) {
-                    journalArticleHashMap.put(articleId, journalArticle);
+
+                if (!journalArticle.isInTrash()) {
+                    if (!journalArticleHashMap.containsKey(articleId)) {
+                        journalArticleHashMap.put(articleId, journalArticle);
+                    }
                 }
             }
         } catch (SystemException e) {
