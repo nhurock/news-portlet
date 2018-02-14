@@ -10,19 +10,19 @@
 
 	<properties>
 		<liferay.app.server.deploy.dir>
-			C:\liferay portal 6.2\liferay-portal-6.2-ce-ga6\deploy
+			C:\liferay-portal-6.2-ce-ga6\deploy
 		</liferay.app.server.deploy.dir>
 
 		<liferay.app.server.lib.global.dir>
-			C:\liferay portal 6.2\liferay-portal-6.2-ce-ga6\tomcat-7.0.62\lib\ext
+			C:\liferay-portal-6.2-ce-ga6\tomcat-7.0.62\lib\ext
 		</liferay.app.server.lib.global.dir>
 
 		<liferay.app.server.portal.dir>
-			C:\liferay portal 6.2\liferay-portal-6.2-ce-ga6\tomcat-7.0.62\webapps\root
+			C:\liferay-portal-6.2-ce-ga6\tomcat-7.0.62\webapps\root
 		</liferay.app.server.portal.dir>
 
 		<liferay.auto.deploy.dir>
-			C:\liferay portal 6.2\liferay-portal-6.2-ce-ga6\deploy
+			C:\liferay-portal-6.2-ce-ga6\\deploy
 		</liferay.auto.deploy.dir>
 
 		<liferay.maven.plugin.version>
@@ -55,15 +55,6 @@
 					<appServerPortalDir>${liferay.app.server.portal.dir}</appServerPortalDir>
 					<liferayVersion>${liferay.version}</liferayVersion>
 					<pluginType>portlet</pluginType>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5</version>
-				<configuration>
-					<encoding>UTF-8</encoding>
-					<source>1.6</source>
-					<target>1.6</target>
 				</configuration>
 			</plugin>
 			<plugin>

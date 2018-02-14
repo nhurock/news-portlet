@@ -5,12 +5,11 @@ import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
-public class SAXMap {
+class JournalArticleContentSAXMap {
 
-    /**
-     * Возвращает содержимое JournalArticle's Content.
-     */
-    public static String getContent(String journalArticleContent) {
+    private static final String ROOT_STATIC_CONTENT = "/root/static-content";
+
+    static String getContent(String journalArticleContent) {
 
         Document document = null;
         try {
@@ -20,9 +19,7 @@ public class SAXMap {
         }
 
         if (document != null) {
-            Node node = document.selectSingleNode("/root/static-content");
-//            System.out.println(node.getStringValue());
-//            System.out.println("");
+            Node node = document.selectSingleNode(ROOT_STATIC_CONTENT);
             return node.getStringValue();
         } else return null;
     }

@@ -31,7 +31,7 @@ public class JournalArticleMap {
         journalArticleDTO.setTitle(journalArticle.getTitle(LOCALE));
 
         String xmlContentByLocale = journalArticle.getContentByLocale(LANGUAGE_ID);
-        String content = SAXMap.getContent(xmlContentByLocale);
+        String content = JournalArticleContentSAXMap.getContent(xmlContentByLocale);
 
         journalArticleDTO.setContent(content);
         journalArticleDTO.setPublishDate(journalArticle.getCreateDate());
