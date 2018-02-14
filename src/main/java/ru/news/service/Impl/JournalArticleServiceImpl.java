@@ -17,6 +17,8 @@ import java.util.List;
 @Service
 public class JournalArticleServiceImpl implements JournalArticleService {
 
+    private static final int JOURNAL_ARTICLE_STATUS_APPROVED = 0;
+
     @Override
     public List<JournalArticleDTO> getJournalArticlesLatestVersion() {
         List<JournalArticleDTO> journalArticleDTOS = JournalArticleMap.toDto(getLatestVersionJA());
@@ -73,6 +75,7 @@ public class JournalArticleServiceImpl implements JournalArticleService {
                 String articleId = journalArticle.getArticleId();
 
                 if (!journalArticle.isInTrash()) {
+                    if (journalArticle.getStatus() == JOURNAL_ARTICLE_STATUS_APPROVED)
                     if (!journalArticleHashMap.containsKey(articleId)) {
                         journalArticleHashMap.put(articleId, journalArticle);
                     }
