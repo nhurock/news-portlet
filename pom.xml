@@ -22,7 +22,7 @@
 		</liferay.app.server.portal.dir>
 
 		<liferay.auto.deploy.dir>
-			C:\liferay-portal-6.2-ce-ga6\\deploy
+			C:\liferay-portal-6.2-ce-ga6\deploy
 		</liferay.auto.deploy.dir>
 
 		<liferay.maven.plugin.version>
