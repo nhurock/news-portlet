@@ -1,20 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:tns="http://www.activiti.org/test" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" expressionLanguage="http://www.w3.org/1999/XPath" id="m1519219284535" name="" targetNamespace="http://www.activiti.org/test" typeLanguage="http://www.w3.org/2001/XMLSchema">
-  <process id="SingleApprover" isClosed="false" isExecutable="false" name="SingleApprover" processType="None">
+  <process id="SingleApprover" isClosed="false" name="SingleApprover" processType="None">
     <startEvent id="startId" name="StartEvent"/>
-    <userTask activiti:candidateGroups="#{liferayGroups.getGroups(execution, &amp;quot;Organization Administrator, Organization Content Reviewer, Administrator, Portal Content Reviewe&amp;quot;)}" activiti:exclusive="true" id="reviewId" name="ReviewTask"/>
+    <userTask activiti:candidateGroups="#{liferayGroups.getGroups(execution, &quot;Organization Administrator, Organization Content Reviewer, Administrator, Portal Content Reviewer&quot;)}" activiti:exclusive="true" id="reviewId" name="ReviewTask">
+    <extensionElements>
+      <activiti:formProperty id="outputTransition" required="true" type="enum">
+        <activiti:value id="Approve" label="Approve"/>
+        <activiti:value id="Reject" label="Reject"/>
+      </activiti:formProperty>
+    </extensionElements>
+  </userTask>
+    <serviceTask activiti:exclusive="true" activiti:expression="#{updateStatusHandler.updateStatus(execution, &quot;approved&quot;)}" id="changeStatusId" name="Change Status"/>
     <sequenceFlow id="_4" sourceRef="startId" targetRef="reviewId"/>
-    <exclusiveGateway gatewayDirection="Unspecified" id="_5" name="ExclusiveGateway"/>
-    <sequenceFlow id="_6" sourceRef="reviewId" targetRef="_5"/>
-    <userTask activiti:exclusive="true" id="reworkId" name="Rework Asset"/>
-    <sequenceFlow id="_8" name="Reject" sourceRef="_5" targetRef="reworkId">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${outputTransition == "Reject"}]]></conditionExpression>
+    <sequenceFlow id="_6" sourceRef="reviewId" targetRef="exclusivegateway1"/>
+    <exclusiveGateway gatewayDirection="Unspecified" id="exclusivegateway1" name="ExclusiveGateway
+    "/>
+    <sequenceFlow id="_9" name="torewieId" sourceRef="reworkId" targetRef="reviewId"/>
+    <sequenceFlow id="_8" name="Reject" sourceRef="exclusivegateway1" targetRef="reworkId">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${outputTransition == "Reject"}
+      ]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="_9" sourceRef="reworkId" targetRef="reviewId"/>
-    <serviceTask activiti:exclusive="true" activiti:expression="#{updateStatusHandler.updateStatus(execution, &quot;approved&quot;)}" id="changeStatusId" name="Change Status">
-      <documentation id="changeStatusId_D_1"/>
-    </serviceTask>
-    <sequenceFlow id="_11" name="Approve" sourceRef="_5" targetRef="changeStatusId">
+    <userTask activiti:candidateUsers="User" activiti:exclusive="true" id="reworkId" name="Rework Asset"/>
+    <sequenceFlow id="_11" name="Approve" sourceRef="exclusivegateway1" targetRef="changeStatusId">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${outputTransition == "Approve"}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="_13" sourceRef="changeStatusId" targetRef="endTaskId"/>
@@ -34,7 +41,7 @@
           <omgdc:Bounds height="55.0" width="85.0" x="0.0" y="0.0"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="_5" id="Shape-_5" isMarkerVisible="false">
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="Shape-exclusivegateway1" isMarkerVisible="false">
         <omgdc:Bounds height="32.0" width="32.0" x="270.0" y="160.0"/>
         <bpmndi:BPMNLabel>
           <omgdc:Bounds height="32.0" width="32.0" x="0.0" y="0.0"/>
@@ -74,7 +81,7 @@
           <omgdc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_6" id="BPMNEdge__6" sourceElement="reviewId" targetElement="_5">
+      <bpmndi:BPMNEdge bpmnElement="_6" id="BPMNEdge__6" sourceElement="reviewId" targetElement="exclusivegateway1">
         <omgdi:waypoint x="220.0" y="175.0"/>
         <omgdi:waypoint x="245.0" y="175.0"/>
         <omgdi:waypoint x="271.0" y="175.0"/>
@@ -82,7 +89,7 @@
           <omgdc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_8" id="BPMNEdge__8" sourceElement="_5" targetElement="reworkId">
+      <bpmndi:BPMNEdge bpmnElement="_8" id="BPMNEdge__8" sourceElement="exclusivegateway1" targetElement="reworkId">
         <omgdi:waypoint x="302.0" y="176.0"/>
         <omgdi:waypoint x="408.0" y="239.0"/>
         <omgdi:waypoint x="408.0" y="290.0"/>
@@ -98,7 +105,7 @@
           <omgdc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="_11" id="BPMNEdge__11" sourceElement="_5" targetElement="changeStatusId">
+      <bpmndi:BPMNEdge bpmnElement="_11" id="BPMNEdge__11" sourceElement="exclusivegateway1" targetElement="changeStatusId">
         <omgdi:waypoint x="286.0" y="160.0"/>
         <omgdi:waypoint x="286.0" y="90.0"/>
         <bpmndi:BPMNLabel>
