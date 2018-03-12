@@ -13,12 +13,8 @@ import ru.news.model.JournalArticleDTO;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class JournalArticleMap {
-
-    private static final Locale LOCALE = Locale.ENGLISH;
-    private static final String LANGUAGE_ID = "en_US";
 
     public static JournalArticleDTO toDto(JournalArticle journalArticle) {
 
@@ -28,12 +24,10 @@ public class JournalArticleMap {
 
         journalArticleDTO.setGroupId(journalArticle.getGroupId());
         journalArticleDTO.setArticleId(journalArticle.getArticleId());
-        journalArticleDTO.setTitle(journalArticle.getTitle(LOCALE));
 
-        String xmlContentByLocale = journalArticle.getContentByLocale(LANGUAGE_ID);
-        String content = JournalArticleContentSAXMap.getContent(xmlContentByLocale);
+        journalArticleDTO.setTitle(journalArticle.getTitle());
+        journalArticleDTO.setContent(journalArticle.getContent());
 
-        journalArticleDTO.setContent(content);
         journalArticleDTO.setPublishDate(journalArticle.getCreateDate());
 
         List<String> tags = new ArrayList<>();
@@ -61,7 +55,7 @@ public class JournalArticleMap {
     public static List<JournalArticleDTO> toDto(List<JournalArticle> journalArticles) {
         if (journalArticles == null) return null;
 
-        ArrayList<JournalArticleDTO> journalArticleDTOS = new ArrayList<>();
+        List<JournalArticleDTO> journalArticleDTOS = new ArrayList<>();
         for (JournalArticle journalArticle : journalArticles) {
             journalArticleDTOS.add(toDto(journalArticle));
         }
