@@ -1,15 +1,15 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: pushkin
-  Date: 31.01.2018
-  Time: 15:28
-  To change this template use File | Settings | File Templates.
---%>
-<%@include file="init.jsp" %>
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
+<%@include file="init.jsp" %>
+
+<a href="<portlet:renderURL />">&laquo;Home</a>
+<div class="separator"></div>
+
+<c:out value="<%=currentUser.getLanguageId() %>"/>
+<br>
 
 
 <b><%--@elvariable id="news" type="ru.news.model.JournalArticleDTO"--%>
