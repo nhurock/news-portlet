@@ -5,11 +5,11 @@ import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 
-class JournalArticleContentSAXMap {
+public class JournalArticleContentSAXMap {
 
     private static final String ROOT_STATIC_CONTENT = "/root/static-content";
 
-    static String getContent(String journalArticleContent) {
+    public static String getContent(String journalArticleContent) {
 
         Document document = null;
         try {

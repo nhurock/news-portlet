@@ -1,85 +1,77 @@
 package ru.news;
 
-import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.util.ReleaseInfo;
-import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import ru.news.model.JournalArticleDTO;
-import ru.news.service.JournalArticleService;
+import ru.news.service.JournalArticleCustomService;
+import ru.news.service.LocalisationService;
 
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 @RequestMapping("VIEW")
 public class PortletViewController {
 
-    private final
-    JournalArticleService journalArticleService;
+    private static final String PAGE_VIEW = "newsblock-mvcportlet/view";
+    private static final String PAGE_NEWS = "newsblock-mvcportlet/news";
+    private static final String RENDER_SINGLE_NEWS = "renderSingleNews";
+    private static final String RENDER_TAG_VIEW = "renderTagView";
+    private static final String RENDER_CATEGORY_VIEW = "renderCategoryView";
+    private static final String ACTION_RENDER_SINGLE_NEWS = "action=" + RENDER_SINGLE_NEWS;
+    private static final String ACTION_RENDER_TAG_VIEW = "action=" + RENDER_TAG_VIEW;
+    private static final String ACTION_RENDER_CATEGORY_VIEW = "action=" + RENDER_CATEGORY_VIEW;
+
+    private final JournalArticleCustomService journalArticleCustomService;
 
     @Autowired
-    public PortletViewController(JournalArticleService journalArticleService) {
-        this.journalArticleService = journalArticleService;
+    public PortletViewController(JournalArticleCustomService journalArticleCustomService) {
+        this.journalArticleCustomService = journalArticleCustomService;
     }
 
     @RenderMapping
-    public String question(Model model) {
-        model.addAttribute("releaseInfo", ReleaseInfo.getBuildDate());
+    public String renderMainView(Model model) {
 
-        List<JournalArticleDTO> articleDTOS = new ArrayList<>();
-
-        try {
-            if (JournalArticleLocalServiceUtil.getJournalArticlesCount() > 0) {
-
-                articleDTOS = journalArticleService.getJournalArticlesLatestVersion();
-
-            }
-        } catch (SystemException e) {
-            e.printStackTrace();
-        }
-
-        model.addAttribute("newsList", articleDTOS);
-
-        return "newsblock-mvcportlet/view";
+        return PAGE_VIEW;
     }
 
-    @RenderMapping(params = "action=renderSingleNews")
+    @RenderMapping(params = ACTION_RENDER_SINGLE_NEWS)
     public String renderSingleNewsView(RenderRequest request, RenderResponse response, Model model) {
 
         long groupId = Long.parseLong(request.getParameter("groupId"));
         String article = request.getParameter("articleId");
-        JournalArticleDTO journalArticleDTO = journalArticleService.getJournalArticleLatestVersion(groupId, article);
+        JournalArticleDTO journalArticleDTO = journalArticleCustomService.getJournalArticleLatestVersion(groupId, article);
+
+        LocalisationService.localize(journalArticleDTO, request.getLocale());
 
         model.addAttribute("news", journalArticleDTO);
-        return "newsblock-mvcportlet/news";
+        return PAGE_NEWS;
     }
 
-    @RenderMapping(params = "action=renderTagView")
+    @RenderMapping(params = ACTION_RENDER_TAG_VIEW)
     public String renderTagView(RenderRequest request, RenderResponse response, Model model) {
         String tag = request.getParameter("tag");
 
-        List<JournalArticleDTO> journalArticlesByTag = journalArticleService.getJournalArticleByTag(tag);
+        List<JournalArticleDTO> journalArticlesByTag = journalArticleCustomService.getJournalArticleByTag(tag);
 
         model.addAttribute("newsList", journalArticlesByTag);
         model.addAttribute("tag", tag);
-        return "newsblock-mvcportlet/view";
+        return PAGE_VIEW;
     }
 
-    @RenderMapping(params = "action=renderCategoryView")
+    @RenderMapping(params = ACTION_RENDER_CATEGORY_VIEW)
     public String renderCategoryView(RenderRequest request, RenderResponse response, Model model) {
         String category = request.getParameter("category");
 
-        List<JournalArticleDTO> journalArticlesByTag = journalArticleService.getJournalArticleByCategory(category);
+        List<JournalArticleDTO> journalArticlesByTag = journalArticleCustomService.getJournalArticleByCategory(category);
 
         model.addAttribute("newsList", journalArticlesByTag);
         model.addAttribute("category", category);
-        return "newsblock-mvcportlet/view";
+        return PAGE_VIEW;
     }
 
 }

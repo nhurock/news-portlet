@@ -8,14 +8,14 @@ import org.springframework.stereotype.Service;
 import ru.news.comparator.JournalArticleDTOComparator;
 import ru.news.mapper.JournalArticleMap;
 import ru.news.model.JournalArticleDTO;
-import ru.news.service.JournalArticleService;
+import ru.news.service.JournalArticleCustomService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 @Service
-public class JournalArticleServiceImpl implements JournalArticleService {
+public class JournalArticleCustomServiceImpl implements JournalArticleCustomService {
 
     private static final int JOURNAL_ARTICLE_STATUS_APPROVED = 0;
 
@@ -56,7 +56,8 @@ public class JournalArticleServiceImpl implements JournalArticleService {
         return articleDTOListWithCategory;
     }
 
-    private JournalArticle getLatestVersion(long groupId, String articleId) {
+    @Override
+    public JournalArticle getLatestVersion(long groupId, String articleId) {
         double latestVersion;
         JournalArticle journalArticle = null;
         try {
@@ -76,9 +77,9 @@ public class JournalArticleServiceImpl implements JournalArticleService {
 
                 if (!journalArticle.isInTrash()) {
                     if (journalArticle.getStatus() == JOURNAL_ARTICLE_STATUS_APPROVED)
-                    if (!journalArticleHashMap.containsKey(articleId)) {
-                        journalArticleHashMap.put(articleId, journalArticle);
-                    }
+                        if (!journalArticleHashMap.containsKey(articleId)) {
+                            journalArticleHashMap.put(articleId, journalArticle);
+                        }
                 }
             }
         } catch (SystemException e) {
