@@ -3,6 +3,7 @@
 <%@ page import="ru.news.model.JournalArticleDTO" %>
 <%@ page import="ru.news.service.Impl.JournalArticleCustomServiceImpl" %>
 <%@ page import="ru.news.service.LocalisationService" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -12,8 +13,7 @@
 <%
     JournalArticleCustomServiceImpl journalArticleService = new JournalArticleCustomServiceImpl();
     List<JournalArticleDTO> newsList = journalArticleService.getJournalArticlesLatestVersion();
-    LocalisationService.localize(newsList, currentUser.getLocale());
-
+    LocalisationService.localize(newsList, user.getLocale());
 %>
 
 <liferay-portlet:renderURL varImpl="iteratorURL">

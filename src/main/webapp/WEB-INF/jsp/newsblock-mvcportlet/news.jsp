@@ -8,7 +8,6 @@
 <a href="<portlet:renderURL />">&laquo;Home</a>
 <div class="separator"></div>
 
-<c:out value="<%=currentUser.getLanguageId() %>"/>
 <br>
 
 
