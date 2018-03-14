@@ -16,8 +16,6 @@ import java.util.Locale;
 @Service
 public class LocalisationService {
 
-    private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
-
     private static JournalArticleCustomService journalArticleCustomService;
 
     @Autowired
@@ -27,13 +25,21 @@ public class LocalisationService {
 
     public static void localize(JournalArticleDTO journalArticleDTO, Locale locale) {
 
-        if (locale == null) locale = DEFAULT_LOCALE;
-
         JournalArticle journalArticle = journalArticleCustomService.getLatestVersion(journalArticleDTO.getGroupId(), journalArticleDTO.getArticleId());
-        String languageId = LanguageUtil.getLanguageId(locale);
 
-        String title = journalArticle.getTitle(locale);
-        String xmlContent = journalArticle.getContentByLocale(languageId);
+        String languageIdDefault;
+        Locale localeDefault;
+        if (locale == null) {
+            languageIdDefault = journalArticle.getDefaultLanguageId();
+            localeDefault = LanguageUtil.getLocale(languageIdDefault);
+        }
+            else {
+            languageIdDefault = locale.getLanguage();
+            localeDefault = locale;
+        }
+
+        String title = journalArticle.getTitle(localeDefault);
+        String xmlContent = journalArticle.getContentByLocale(languageIdDefault);
         String content = JournalArticleContentSAXMap.getContent(xmlContent);
 
         journalArticleDTO.setTitle(title);
@@ -41,8 +47,6 @@ public class LocalisationService {
     }
 
     public static void localize(List<JournalArticleDTO> journalArticleDTOS, Locale locale) {
-
-        if (locale == null) locale = DEFAULT_LOCALE;
 
         for (JournalArticleDTO journalArticleDTO : journalArticleDTOS) {
             localize(journalArticleDTO, locale);
