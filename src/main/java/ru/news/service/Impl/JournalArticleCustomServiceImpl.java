@@ -17,11 +17,22 @@ import java.util.List;
 @Service
 public class JournalArticleCustomServiceImpl implements JournalArticleCustomService {
 
-    private static final int JOURNAL_ARTICLE_STATUS_APPROVED = 0;
+    @Override
+    public List<JournalArticleDTO> getJournalArticlesLatestVersion(Boolean showArchiveNews) {
+        if (showArchiveNews) return getApprovedAndExpiredJournalArticlesLatestVersion();
+        else return getApprovedJournalArticlesLatestVersion();
+    }
 
     @Override
-    public List<JournalArticleDTO> getJournalArticlesLatestVersion() {
-        List<JournalArticleDTO> journalArticleDTOS = JournalArticleMap.toDto(getLatestVersionJA());
+    public List<JournalArticleDTO> getApprovedJournalArticlesLatestVersion() {
+        List<JournalArticleDTO> journalArticleDTOS = JournalArticleMap.toDto(getLatestVersionApprovedJournalArticle());
+        journalArticleDTOS.sort(new JournalArticleDTOComparator().reversed());
+        return journalArticleDTOS;
+    }
+
+    @Override
+    public List<JournalArticleDTO> getApprovedAndExpiredJournalArticlesLatestVersion() {
+        List<JournalArticleDTO> journalArticleDTOS = JournalArticleMap.toDto(getLatestVersionApprovedAndExpiredJournalArticle());
         journalArticleDTOS.sort(new JournalArticleDTOComparator().reversed());
         return journalArticleDTOS;
     }
@@ -34,7 +45,7 @@ public class JournalArticleCustomServiceImpl implements JournalArticleCustomServ
 
     @Override
     public List<JournalArticleDTO> getJournalArticleByTag(String tag) {
-        List<JournalArticleDTO> journalArticleDTOS = getJournalArticlesLatestVersion();
+        List<JournalArticleDTO> journalArticleDTOS = getApprovedJournalArticlesLatestVersion();
         List<JournalArticleDTO> articleDTOListWithTag = new ArrayList<>();
         for (JournalArticleDTO journalArticleDTO : journalArticleDTOS) {
             if (journalArticleDTO.getTags().contains(tag)) {
@@ -46,7 +57,7 @@ public class JournalArticleCustomServiceImpl implements JournalArticleCustomServ
 
     @Override
     public List<JournalArticleDTO> getJournalArticleByCategory(String category) {
-        List<JournalArticleDTO> journalArticleDTOS = getJournalArticlesLatestVersion();
+        List<JournalArticleDTO> journalArticleDTOS = getApprovedJournalArticlesLatestVersion();
         List<JournalArticleDTO> articleDTOListWithCategory = new ArrayList<>();
         for (JournalArticleDTO journalArticleDTO : journalArticleDTOS) {
             if (journalArticleDTO.getCategory().contains(category)) {
@@ -69,18 +80,33 @@ public class JournalArticleCustomServiceImpl implements JournalArticleCustomServ
         return journalArticle;
     }
 
-    private List<JournalArticle> getLatestVersionJA() {
+    private List<JournalArticle> getLatestVersionApprovedJournalArticle() {
         HashMap<String, JournalArticle> journalArticleHashMap = new HashMap<>();
         try {
             for (JournalArticle journalArticle : JournalArticleLocalServiceUtil.getArticles()) {
                 String articleId = journalArticle.getArticleId();
 
-                if (!journalArticle.isInTrash()) {
-                    if (journalArticle.getStatus() == JOURNAL_ARTICLE_STATUS_APPROVED)
-                        if (!journalArticleHashMap.containsKey(articleId)) {
-                            journalArticleHashMap.put(articleId, journalArticle);
-                        }
-                }
+                if (!journalArticle.isInTrash() && journalArticle.isApproved())
+                    if (!journalArticleHashMap.containsKey(articleId)) {
+                        journalArticleHashMap.put(articleId, journalArticle);
+                    }
+            }
+        } catch (SystemException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>(journalArticleHashMap.values());
+    }
+
+    private List<JournalArticle> getLatestVersionApprovedAndExpiredJournalArticle() {
+        HashMap<String, JournalArticle> journalArticleHashMap = new HashMap<>();
+        try {
+            for (JournalArticle journalArticle : JournalArticleLocalServiceUtil.getArticles()) {
+                String articleId = journalArticle.getArticleId();
+
+                if (!journalArticle.isInTrash() && (journalArticle.isApproved() || journalArticle.isExpired()))
+                    if (!journalArticleHashMap.containsKey(articleId)) {
+                        journalArticleHashMap.put(articleId, journalArticle);
+                    }
             }
         } catch (SystemException e) {
             e.printStackTrace();

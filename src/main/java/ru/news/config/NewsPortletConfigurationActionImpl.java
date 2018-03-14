@@ -1,6 +1,9 @@
 package ru.news.config;
 
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
+import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portlet.PortletPreferencesFactoryUtil;
 
 import javax.portlet.*;
 
@@ -10,7 +13,15 @@ public class NewsPortletConfigurationActionImpl implements ConfigurationAction {
 
     @Override
     public void processAction(PortletConfig portletConfig, ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
+        String portletResource = ParamUtil.getString(actionRequest, "portletResource");
+        String enableArchiveNews = ParamUtil.get(actionRequest, "enableArchiveNews", "");
 
+        PortletPreferences prefs = PortletPreferencesFactoryUtil.getPortletSetup(actionRequest, portletResource);
+        prefs.setValue("enableArchiveNews", enableArchiveNews);
+        prefs.store();
+
+        SessionMessages.add(actionRequest, "config-stored");
+        SessionMessages.add(actionRequest, portletConfig.getPortletName() + SessionMessages.KEY_SUFFIX_REFRESH_PORTLET, portletResource);
     }
 
     @Override

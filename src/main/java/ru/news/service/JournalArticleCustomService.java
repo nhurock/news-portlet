@@ -7,7 +7,11 @@ import java.util.List;
 
 public interface JournalArticleCustomService {
 
-    List<JournalArticleDTO> getJournalArticlesLatestVersion();
+    List<JournalArticleDTO> getJournalArticlesLatestVersion(Boolean showArchiveNews);
+
+    List<JournalArticleDTO> getApprovedJournalArticlesLatestVersion();
+
+    List<JournalArticleDTO> getApprovedAndExpiredJournalArticlesLatestVersion();
 
     JournalArticleDTO getJournalArticleLatestVersion(long groupId, String articleId);
 

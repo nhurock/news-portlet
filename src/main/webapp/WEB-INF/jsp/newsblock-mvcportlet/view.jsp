@@ -4,6 +4,7 @@
 <%@ page import="ru.news.service.Impl.JournalArticleCustomServiceImpl" %>
 <%@ page import="ru.news.service.LocalisationService" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Objects" %>
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -12,7 +13,10 @@
 <%@include file="init.jsp" %>
 <%
     JournalArticleCustomServiceImpl journalArticleService = new JournalArticleCustomServiceImpl();
-    List<JournalArticleDTO> newsList = journalArticleService.getJournalArticlesLatestVersion();
+    String showArchiveNews = portletPreferences.getValue("enableArchiveNews", "");
+    Boolean showArchiveNewsFlag;
+    showArchiveNewsFlag = Objects.equals(showArchiveNews, "on");
+    List<JournalArticleDTO> newsList = journalArticleService.getJournalArticlesLatestVersion(showArchiveNewsFlag);
     LocalisationService.localize(newsList, user.getLocale());
 %>
 
