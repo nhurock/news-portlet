@@ -34,7 +34,7 @@ public class LocalisationService {
             localeDefault = LanguageUtil.getLocale(languageIdDefault);
         }
             else {
-            languageIdDefault = locale.getLanguage();
+            languageIdDefault = locale.toString();
             localeDefault = locale;
         }
 
