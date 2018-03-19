@@ -9,15 +9,16 @@ import javax.portlet.*;
 
 public class NewsPortletConfigurationActionImpl implements ConfigurationAction {
 
+    private static final String ENABLE_ARCHIVE_NEWS = "enableArchiveNews";
     private static final String PAGE_CONFIGURATION = "/WEB-INF/jsp/newsblock-mvcportlet/configuration.jsp";
 
     @Override
     public void processAction(PortletConfig portletConfig, ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
         String portletResource = ParamUtil.getString(actionRequest, "portletResource");
-        String enableArchiveNews = ParamUtil.get(actionRequest, "enableArchiveNews", "");
+        String enableArchiveNews = ParamUtil.get(actionRequest, ENABLE_ARCHIVE_NEWS, "");
 
         PortletPreferences prefs = PortletPreferencesFactoryUtil.getPortletSetup(actionRequest, portletResource);
-        prefs.setValue("enableArchiveNews", enableArchiveNews);
+        prefs.setValue(ENABLE_ARCHIVE_NEWS, enableArchiveNews);
         prefs.store();
 
         SessionMessages.add(actionRequest, "config-stored");
