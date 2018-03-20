@@ -2,7 +2,6 @@
 <%@ taglib uri="http://alloy.liferay.com/tld/aui" prefix="aui" %>
 <%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 <%@ taglib uri="http://liferay.com/tld/theme" prefix="theme" %>
-<%@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
 <%@ page import="com.liferay.portal.util.PortalUtil" %>
 
 <portlet:defineObjects/>
@@ -10,5 +9,4 @@
 
 <%
     String currentURL = PortalUtil.getCurrentURL(request);
-    String title = ParamUtil.getString(request, "title");
 %>

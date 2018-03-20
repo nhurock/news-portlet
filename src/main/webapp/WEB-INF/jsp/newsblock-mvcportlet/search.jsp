@@ -1,17 +1,22 @@
 <%@ taglib prefix="liferay-ui" uri="http://liferay.com/tld/ui" %>
 <%@ taglib prefix="aui" uri="http://alloy.liferay.com/tld/aui" %>
-<%@ page import="com.liferay.portal.kernel.dao.search.SearchContainer" %>
-<%@ page import="com.liferay.portal.kernel.dao.search.DisplayTerms" %>
+<%@ page import="ru.news.search.JournalArticleDTODisplayTerms" %>
+<%@ page import="ru.news.search.JournalArticleDTOSearchContainer" %>
 
 <%@include file="init.jsp" %>
 
 <%
-    SearchContainer searchContainer = (SearchContainer)request.getAttribute("liferay-ui:search:searchContainer");
-    DisplayTerms displayTerms = searchContainer.getDisplayTerms();
+    JournalArticleDTOSearchContainer searchContainer = (JournalArticleDTOSearchContainer) request.getAttribute("liferay-ui:search:searchContainer");
+    JournalArticleDTODisplayTerms displayTerms = (JournalArticleDTODisplayTerms) searchContainer.getDisplayTerms();
+
+/*    String showArchiveNews = portletPreferences.getValue("enableArchiveNews", "");
+    Boolean showArchiveNewsFlag;
+    showArchiveNewsFlag = Objects.equals(showArchiveNews, "on");
+    displayTerms.setEnableArchiveNews(showArchiveNewsFlag);*/
 %>
 
 <liferay-ui:search-toggle buttonLabel="News Search" displayTerms="<%= displayTerms %>" id="toggle_id_news_search">
-    <aui:input name="title" label="Title" value="<%=title %>" />
-    <%--<aui:input name="category" label="Categroy" value="category" />
-    <aui:input name="tag" label="Tag" value="tag" />--%>
+    <aui:input label="Title" name="title" value="<%=displayTerms.getTitle() %>"/>
+    <%--<aui:input label="Tag" name="tag" value="<%=displayTerms.getTag() %>"/>--%>
+    <%--<aui:input label="Categroy" name="category" value="<%=displayTerms.getCategory() %>"/>--%>
 </liferay-ui:search-toggle>
