@@ -88,8 +88,14 @@ public class JournalArticleDTOLocalServiceUtil {
             return null;
         }
 
-        List<JournalArticle> resultJournalArticle = new ArrayList<>(dynamicQuery1);
-        return JournalArticleMap.toDto(resultJournalArticle);
+        HashMap<String, JournalArticleDTO> journalArticleHashMap = new HashMap<>();
+        for (JournalArticle journalArticle : dynamicQuery1) {
+            String articleId = journalArticle.getArticleId();
+            if (!journalArticleHashMap.containsKey(articleId)) {
+                journalArticleHashMap.put(articleId, getLatestVersion(journalArticle.getGroupId(), journalArticle.getArticleId()));
+            }
+        }
+        return new ArrayList<>(journalArticleHashMap.values());
     }
 
     /**
