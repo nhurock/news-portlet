@@ -34,7 +34,7 @@ public class JournalArticleDTOLocalServiceUtil {
      * Возвращает список актуальных {@link JournalArticleDTO} cо статусом Approved и Expired
      */
     static List<JournalArticleDTO> getApprovedAndExpiredJournalArticlesLatestVersion() {
-        List<JournalArticleDTO> journalArticleDTOS = JournalArticleMap.toDto(getLatestVersionApprovedAndExpiredJournalArticle());
+        List<JournalArticleDTO> journalArticleDTOS = getLatestVersionApprovedAndExpiredJournalArticle();
         journalArticleDTOS.sort(new JournalArticleDTOComparator().reversed());
         return journalArticleDTOS;
     }
@@ -46,26 +46,29 @@ public class JournalArticleDTOLocalServiceUtil {
      * @param groupId   groupId {@link JournalArticle}
      */
     public static JournalArticleDTO getJournalArticleLatestVersion(long groupId, String articleId) {
-        JournalArticle latestVersion = getLatestVersion(groupId, articleId);
+        JournalArticle latestVersion = null;
+        try {
+            latestVersion = JournalArticleLocalServiceUtil.getLatestArticle(groupId, articleId);
+        } catch (PortalException | SystemException e) {
+            e.printStackTrace();
+        }
         return JournalArticleMap.toDto(latestVersion);
     }
 
-    /**
-     * Возвращает последнюю версию WebContent {@link JournalArticle}
+   /* *//**
+     * Возвращает последнюю версию WebContent {@link JournalArticleDTO}
      *
      * @param articleId ID {@link JournalArticle}
      * @param groupId   groupId {@link JournalArticle}
      */
-    static JournalArticle getLatestVersion(long groupId, String articleId) {
-        double latestVersion;
+    private static JournalArticleDTO getLatestVersion(long groupId, String articleId) {
         JournalArticle journalArticle = null;
         try {
-            latestVersion = JournalArticleLocalServiceUtil.getLatestVersion(groupId, articleId);
-            journalArticle = JournalArticleLocalServiceUtil.getArticle(groupId, articleId, latestVersion);
+            journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(groupId, articleId);
         } catch (PortalException | SystemException e) {
             e.printStackTrace();
         }
-        return journalArticle;
+        return JournalArticleMap.toDto(journalArticle);
     }
 
     /**
@@ -85,23 +88,15 @@ public class JournalArticleDTOLocalServiceUtil {
             return null;
         }
 
-        HashMap<String, JournalArticle> journalArticleHashMap = new HashMap<>();
-        for (JournalArticle journalArticle : dynamicQuery1) {
-            String articleId = journalArticle.getArticleId();
-            if (!journalArticleHashMap.containsKey(articleId)) {
-                journalArticleHashMap.put(articleId, journalArticle);
-            }
-        }
-        List<JournalArticle> resultJournalArticle = new ArrayList<>();
-        resultJournalArticle.addAll(journalArticleHashMap.values());
+        List<JournalArticle> resultJournalArticle = new ArrayList<>(dynamicQuery1);
         return JournalArticleMap.toDto(resultJournalArticle);
     }
 
     /**
      * Возвращает список актуальных {@link JournalArticle} со статусом Approved и Expired
      */
-    private static List<JournalArticle> getLatestVersionApprovedAndExpiredJournalArticle() {
-        HashMap<String, JournalArticle> journalArticleHashMap = new HashMap<>();
+    private static List<JournalArticleDTO> getLatestVersionApprovedAndExpiredJournalArticle() {
+        HashMap<String, JournalArticleDTO> journalArticleHashMap = new HashMap<>();
         try {
             for (JournalArticle journalArticle : JournalArticleLocalServiceUtil.getArticles()) {
                 String articleId = journalArticle.getArticleId();
@@ -115,6 +110,7 @@ public class JournalArticleDTOLocalServiceUtil {
         } catch (SystemException e) {
             e.printStackTrace();
         }
+
         return new ArrayList<>(journalArticleHashMap.values());
     }
 
@@ -122,7 +118,12 @@ public class JournalArticleDTOLocalServiceUtil {
      * Возращает true если запись имеент статус Expired
      */
     private static Boolean isExpired(JournalArticleDTO journalArticleDTO) {
-        JournalArticle journalArticle = getLatestVersion(journalArticleDTO.getGroupId(), journalArticleDTO.getArticleId());
-        return journalArticle.isExpired();
+        JournalArticle journalArticle = null;
+        try {
+            journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(journalArticleDTO.getGroupId(), journalArticleDTO.getArticleId());
+        } catch (PortalException | SystemException e) {
+            e.printStackTrace();
+        }
+        return journalArticle != null && journalArticle.isExpired();
     }
 }
