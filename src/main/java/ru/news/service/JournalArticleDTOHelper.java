@@ -1,18 +1,29 @@
 package ru.news.service;
 
 import com.liferay.portal.kernel.dao.orm.*;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.model.AssetTag;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
 import ru.news.model.JournalArticleDTO;
 import ru.news.search.JournalArticleDTODisplayTerms;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 
 public class JournalArticleDTOHelper {
+
+    private static final String PROPERTY_TITLE = "title";
+    private static final String PROPERTY_RESOURCE_PRIM_KEY = "resourcePrimKey";
+    private static final String PROPERTY_CONTENT = "content";
+    private static final String PROPERTY_NAME = "name";
 
     public static List<JournalArticleDTO> getJournalArticle(JournalArticleDTODisplayTerms displayTerms, int start, int end) {
         List<JournalArticleDTO> articleDTOS = getJournalArticleData(displayTerms);
@@ -33,35 +44,45 @@ public class JournalArticleDTOHelper {
     private static List<JournalArticleDTO> getJournalArticleData(JournalArticleDTODisplayTerms displayTerms) {
         List<JournalArticleDTO> journalArticles;
         Locale locale = displayTerms.getLocale();
+        ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
         if (Validator.isBlank(displayTerms.getKeywords()) && (!displayTerms.isAdvancedSearch())) {
 //            Получения данных без фильтров поиска
             journalArticles = JournalArticleDTOLocalServiceUtil.getApprovedAndExpiredJournalArticlesLatestVersion();
         } else {
-            ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
-            DynamicQuery dynamicQueryJournalArticle = DynamicQueryFactoryUtil.forClass(JournalArticle.class, "ja", classLoader);
-            Junction junction = null;
+
+            DynamicQuery dynamicQueryJournalArticle = DynamicQueryFactoryUtil.forClass(JournalArticle.class, "journalArticle", classLoader);
+            Junction junctionJournalArticle;
 //            Расширенный поиск
             if (displayTerms.isAdvancedSearch()) {
                 if (displayTerms.isAndOperator()) {
-                    junction = RestrictionsFactoryUtil.conjunction();
+                    junctionJournalArticle = RestrictionsFactoryUtil.conjunction();
                 } else {
-                    junction = RestrictionsFactoryUtil.disjunction();
+                    junctionJournalArticle = RestrictionsFactoryUtil.disjunction();
                 }
 
                 if (!Validator.isBlank(displayTerms.getTitle())) {
-                    junction.add(PropertyFactoryUtil.forName("ja.title").like("%" + displayTerms.getTitle() + "%"));
+                    junctionJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_TITLE).like("%" + displayTerms.getTitle() + "%"));
                 }
+                String tag = displayTerms.getTag();
+                if (!Validator.isBlank(tag)) {
+                    Junction disjunction = RestrictionsFactoryUtil.disjunction();
+                    for (Long resourcePrimaryKey : getJournalArticleResourcePrimKey(tag)) {
+                        disjunction.add(PropertyFactoryUtil.forName(PROPERTY_RESOURCE_PRIM_KEY).eq(resourcePrimaryKey));
+                    }
+                    junctionJournalArticle.add(disjunction);
+                }
+
             } else {
 //                 Поиск по основному полю
-                junction = RestrictionsFactoryUtil.disjunction();
-                junction.add(PropertyFactoryUtil.forName("ja.title").like("%" + displayTerms.getKeywords() + "%"));
-                junction.add(PropertyFactoryUtil.forName("ja.content").like("%" + displayTerms.getKeywords() + "%"));
+                junctionJournalArticle = RestrictionsFactoryUtil.disjunction();
+                junctionJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_TITLE).like("%" + displayTerms.getKeywords() + "%"));
+                junctionJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_CONTENT).like("%" + displayTerms.getKeywords() + "%"));
             }
-            dynamicQueryJournalArticle.add(junction);
+            dynamicQueryJournalArticle.add(junctionJournalArticle);
             journalArticles = JournalArticleDTOLocalServiceUtil.getDynamicQuery(dynamicQueryJournalArticle);
         }
 
-//         Фильтрация контента
+//         Фильтрация контента по контенту
         if (!displayTerms.getEnableArchiveNews()) {
             // Удаление архивных новостей
             JournalArticleDTOLocalServiceUtil.deleteExpiredJournalArticle(journalArticles);
@@ -71,4 +92,40 @@ public class JournalArticleDTOHelper {
         LocalisationService.localize(journalArticles, locale);
         return journalArticles;
     }
+
+    /**
+     * Возвращает список resourcePrimKey сущностей JournalArticle по задданому тэгу
+     *
+     * @param tagName имя тэга новости
+     */
+    private static List<Long> getJournalArticleResourcePrimKey(String tagName) {
+        ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
+        DynamicQuery dynamicQueryAssetTag = DynamicQueryFactoryUtil.forClass(AssetTag.class, "assetTag", classLoader);
+        Junction junctionAssetTag = RestrictionsFactoryUtil.disjunction();
+        junctionAssetTag.add(PropertyFactoryUtil.forName(PROPERTY_NAME).like(tagName));
+        dynamicQueryAssetTag.add(junctionAssetTag);
+        List<AssetTag> assetTags = new ArrayList<>();
+        List<Long> resourcePrimKeyList = new ArrayList<>();
+        try {
+            assetTags = AssetTagLocalServiceUtil.dynamicQuery(dynamicQueryAssetTag);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        }
+        if (assetTags != null) {
+            for (AssetTag assetTag : assetTags) {
+                try {
+                    List<AssetEntry> assetTagAssetEntries = AssetEntryLocalServiceUtil.getAssetTagAssetEntries(assetTag.getTagId());
+                    long resourcePrimaryKey;
+                    for (AssetEntry assetEntry : assetTagAssetEntries) {
+                        resourcePrimaryKey = assetEntry.getClassPK();
+                        resourcePrimKeyList.add(resourcePrimaryKey);
+                    }
+                } catch (SystemException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return resourcePrimKeyList;
+    }
+
 }
