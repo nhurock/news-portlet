@@ -13,7 +13,7 @@ public class JournalArticleDTOSearchContainer extends SearchContainer<JournalArt
     private static final int DELTA = 5;
     private static final String TITLE = "title";
     private static final String TAG = "tag";
-//    private static final String CATEGORY = "category";
+    private static final String CATEGORY = "category";
     private static final String ENABLE_ARCHIVE_NEWS = "enableArchiveNews";
     private static final List<String> HEADER_NAMES = null;
 
@@ -22,8 +22,7 @@ public class JournalArticleDTOSearchContainer extends SearchContainer<JournalArt
         JournalArticleDTODisplayTerms displayTerms = (JournalArticleDTODisplayTerms) getDisplayTerms();
         iteratorURL.setParameter(TITLE, displayTerms.getTitle());
         iteratorURL.setParameter(TAG, displayTerms.getTag());
-//        iteratorURL.setParameter(CATEGORY, displayTerms.getCategory());
-
+        iteratorURL.setParameter(CATEGORY, displayTerms.getCategory());
         iteratorURL.setParameter(ENABLE_ARCHIVE_NEWS, String.valueOf(displayTerms.getEnableArchiveNews()));
     }
 }

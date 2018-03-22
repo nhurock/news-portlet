@@ -18,5 +18,5 @@
 <liferay-ui:search-toggle buttonLabel="News Search" displayTerms="<%= displayTerms %>" id="toggle_id_news_search">
     <aui:input label="Title" name="title" value="<%=displayTerms.getTitle() %>"/>
     <aui:input label="Tag" name="tag" value="<%=displayTerms.getTag() %>"/>
-    <%--<aui:input label="Categroy" name="category" value="<%=displayTerms.getCategory() %>"/>--%>
+    <aui:input label="Categroy" name="category" value="<%=displayTerms.getCategory() %>"/>
 </liferay-ui:search-toggle>

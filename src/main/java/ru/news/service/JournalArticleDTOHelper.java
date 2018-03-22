@@ -5,8 +5,10 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetTag;
+import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
@@ -63,11 +65,19 @@ public class JournalArticleDTOHelper {
                 if (!Validator.isBlank(displayTerms.getTitle())) {
                     junctionJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_TITLE).like("%" + displayTerms.getTitle() + "%"));
                 }
-                String tag = displayTerms.getTag();
-                if (!Validator.isBlank(tag)) {
+                String tagName = displayTerms.getTag();
+                if (!Validator.isBlank(tagName)) {
                     Junction disjunction = RestrictionsFactoryUtil.disjunction();
-                    for (Long resourcePrimaryKey : getJournalArticleResourcePrimKey(tag)) {
+                    for (Long resourcePrimaryKey : getJournalArticleResourcePrimKeyByTag(tagName)) {
                         disjunction.add(PropertyFactoryUtil.forName(PROPERTY_RESOURCE_PRIM_KEY).eq(resourcePrimaryKey));
+                    }
+                    junctionJournalArticle.add(disjunction);
+                }
+                String categoryName = displayTerms.getCategory();
+                if (!Validator.isBlank(categoryName)) {
+                    Junction disjunction = RestrictionsFactoryUtil.disjunction();
+                    for (Long resourcePrimKey : getJournalArticleResourcePrimKeyByCategories(categoryName)) {
+                        disjunction.add(PropertyFactoryUtil.forName(PROPERTY_RESOURCE_PRIM_KEY).eq(resourcePrimKey));
                     }
                     junctionJournalArticle.add(disjunction);
                 }
@@ -94,11 +104,47 @@ public class JournalArticleDTOHelper {
     }
 
     /**
+     * Возвращает список resourcePrimKey сущностей JournalArticle по заданной категории
+     *
+     * @param categoriesName имя категории
+     */
+    private static List<Long> getJournalArticleResourcePrimKeyByCategories(String categoriesName) {
+        ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
+        DynamicQuery dynamicQueryAssetCategories = DynamicQueryFactoryUtil.forClass(AssetCategory.class, "assetCategories", classLoader);
+        Junction junctionAssetCategories = RestrictionsFactoryUtil.disjunction();
+        junctionAssetCategories.add(PropertyFactoryUtil.forName(PROPERTY_NAME).like(categoriesName));
+        dynamicQueryAssetCategories.add(junctionAssetCategories);
+        List<AssetCategory> assetCategories = new ArrayList<>();
+        List<Long> resourcePrimKeyList = new ArrayList<>();
+        try {
+            assetCategories = AssetCategoryLocalServiceUtil.dynamicQuery(dynamicQueryAssetCategories);
+        } catch (SystemException e) {
+            e.printStackTrace();
+        }
+        if (assetCategories != null) {
+            for (AssetCategory assetCategory : assetCategories) {
+                try {
+                    List<AssetEntry> assetEntryAssetCategories = AssetEntryLocalServiceUtil.getAssetCategoryAssetEntries(assetCategory.getCategoryId());
+                    long resourcePrimaryKey;
+                    for (AssetEntry assetEntry : assetEntryAssetCategories) {
+                        resourcePrimaryKey = assetEntry.getClassPK();
+                        resourcePrimKeyList.add(resourcePrimaryKey);
+
+                    }
+                } catch (SystemException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return resourcePrimKeyList;
+    }
+
+    /**
      * Возвращает список resourcePrimKey сущностей JournalArticle по задданому тэгу
      *
      * @param tagName имя тэга новости
      */
-    private static List<Long> getJournalArticleResourcePrimKey(String tagName) {
+    private static List<Long> getJournalArticleResourcePrimKeyByTag(String tagName) {
         ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
         DynamicQuery dynamicQueryAssetTag = DynamicQueryFactoryUtil.forClass(AssetTag.class, "assetTag", classLoader);
         Junction junctionAssetTag = RestrictionsFactoryUtil.disjunction();
