@@ -2,6 +2,8 @@ package ru.news.mapper;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetTag;
@@ -16,8 +18,9 @@ import java.util.List;
 
 public class JournalArticleMap {
 
-    public static JournalArticleDTO toDto(JournalArticle journalArticle) {
+    private static Log log = LogFactoryUtil.getLog(JournalArticleMap.class);
 
+    public static JournalArticleDTO toDto(JournalArticle journalArticle) {
         if (journalArticle == null) return null;
 
         JournalArticleDTO journalArticleDTO = new JournalArticleDTO();
@@ -46,9 +49,8 @@ public class JournalArticleMap {
             }
             journalArticleDTO.setCategory(categories);
         } catch (SystemException | PortalException e) {
-            e.printStackTrace();
+            log.trace(e);
         }
-
         return journalArticleDTO;
     }
 

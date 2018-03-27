@@ -10,7 +10,6 @@ public class JournalArticleContentSAXMap {
     private static final String ROOT_STATIC_CONTENT = "/root/static-content";
 
     public static String getContent(String journalArticleContent) {
-
         Document document = null;
         try {
             document = SAXReaderUtil.read(journalArticleContent);
@@ -18,9 +17,9 @@ public class JournalArticleContentSAXMap {
             e.printStackTrace();
         }
 
-        if (document != null) {
-            Node node = document.selectSingleNode(ROOT_STATIC_CONTENT);
-            return node.getStringValue();
-        } else return null;
+        if (document == null) return null;
+
+        Node node = document.selectSingleNode(ROOT_STATIC_CONTENT);
+        return node.getStringValue();
     }
 }

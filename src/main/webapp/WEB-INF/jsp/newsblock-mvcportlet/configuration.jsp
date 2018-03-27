@@ -1,4 +1,5 @@
-<%@ page import="java.util.Objects" %>
+<%@ page import="com.liferay.portal.kernel.util.GetterUtil" %>
+<%@ page import="ru.news.config.NewsPortletConfigurationActionImpl" %>
 <%@ taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %>
 <%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
@@ -8,27 +9,25 @@
 <liferay-portlet:actionURL var="configurationURL" portletConfiguration="true"/>
 <portlet:defineObjects/>
 <%
-    String showArchiveNews = portletPreferences.getValue("enableArchiveNews", "");
-    Boolean showArchiveNewsFlag = Objects.equals(showArchiveNews, "on");
+    String showArchiveNews = portletPreferences.getValue(NewsPortletConfigurationActionImpl.ENABLE_ARCHIVE_NEWS, "");
+    Boolean showArchiveNewsFlag = GetterUtil.getBoolean(showArchiveNews);
 %>
 
 <liferay-ui:success key="config-stored" message="Configuration Saved Successfully"/>
 
-<form method="post" action="<%=configurationURL%>">
+<aui:form method="post" action="<%=configurationURL%>">
     <label>
-        View Archive news:
-
-        <c:if test="<%= showArchiveNewsFlag%>">
-            <input class="enableArchiveNews" id="enableArchiveNewsId" type="checkbox" checked=""
-                   name='<portlet:namespace/>enableArchiveNews'>
-        </c:if>
-
-        <c:if test="<%=!showArchiveNewsFlag%>">
-            <input class="enableArchiveNews" id="enableArchiveNewsId" type="checkbox"
-                   name='<portlet:namespace/>enableArchiveNews'>
-        </c:if>
-
+        <liferay-ui:message key="labelinfo"/>:
+        <c:choose>
+            <c:when test="<%= showArchiveNewsFlag%>">
+                <input class="${NewsPortletConfigurationActionImpl.ENABLE_ARCHIVE_NEWS}" type="checkbox" checked=""
+                       name='<portlet:namespace/>enableArchiveNews'>
+            </c:when>
+            <c:otherwise>
+                <input class="${NewsPortletConfigurationActionImpl.ENABLE_ARCHIVE_NEWS}" type="checkbox"
+                       name='<portlet:namespace/>enableArchiveNews'>
+            </c:otherwise>
+        </c:choose>
     </label>
-    <input type="submit" value="Save">
-</form>
-
+    <button type="submit"><liferay-ui:message key="buttonsave"/></button>
+</aui:form>

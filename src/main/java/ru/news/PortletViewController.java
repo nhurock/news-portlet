@@ -15,14 +15,13 @@ import javax.portlet.RenderResponse;
 @RequestMapping("VIEW")
 public class PortletViewController {
 
+    public static final String RENDER_SINGLE_NEWS = "renderSingleNews";
     private static final String PAGE_VIEW = "newsblock-mvcportlet/view";
     private static final String PAGE_NEWS = "newsblock-mvcportlet/news";
-    private static final String RENDER_SINGLE_NEWS = "renderSingleNews";
     private static final String ACTION_RENDER_SINGLE_NEWS = "action=" + RENDER_SINGLE_NEWS;
 
     @RenderMapping
     public String renderMainView(Model model) {
-
         return PAGE_VIEW;
     }
 
@@ -31,7 +30,7 @@ public class PortletViewController {
 
         long groupId = Long.parseLong(request.getParameter("groupId"));
         String article = request.getParameter("articleId");
-        JournalArticleDTO journalArticleDTO = JournalArticleDTOLocalServiceUtil.getJournalArticleLatestVersion(groupId, article);
+        JournalArticleDTO journalArticleDTO = JournalArticleDTOLocalServiceUtil.getLatestVersion(groupId, article);
 
         LocalisationService.localize(journalArticleDTO, request.getLocale());
 
