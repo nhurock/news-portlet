@@ -46,7 +46,8 @@ public class JournalArticleDTOLocalServiceUtil {
         try {
             journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(groupId, articleId);
         } catch (PortalException | SystemException e) {
-            log.trace(e);
+            log.info("Can't get JournalArticles last version by groupId " + groupId + " and articleId " + articleId + ".");
+            log.error(e);
         }
         return JournalArticleMap.toDto(journalArticle);
     }
@@ -61,7 +62,8 @@ public class JournalArticleDTOLocalServiceUtil {
         try {
             dynamicQuery1 = JournalArticleLocalServiceUtil.dynamicQuery(dynamicQuery);
         } catch (SystemException e) {
-            log.trace(e);
+            log.info("Can't get DynamicQuery from JournalArticleLocalServiceUtil.");
+            log.error(e);
         }
 
         if (dynamicQuery1 == null) return null;
@@ -188,7 +190,8 @@ public class JournalArticleDTOLocalServiceUtil {
         try {
             assetCategories = AssetCategoryLocalServiceUtil.dynamicQuery(dynamicQueryAssetCategories);
         } catch (SystemException e) {
-            log.trace(e);
+            log.info("Can't get DynamicQuery from AssetCategoryLocalServiceUtil.");
+            log.error(e);
         }
         if (assetCategories != null) {
             for (AssetCategory assetCategory : assetCategories) {
@@ -201,7 +204,8 @@ public class JournalArticleDTOLocalServiceUtil {
 
                     }
                 } catch (SystemException e) {
-                    log.trace(e);
+                    log.info("Can't get List of AssetEntry by categoryId " + assetCategory.getCategoryId() + ".");
+                    log.error(e);
                 }
             }
         }
@@ -224,7 +228,8 @@ public class JournalArticleDTOLocalServiceUtil {
         try {
             assetTags = AssetTagLocalServiceUtil.dynamicQuery(dynamicQueryAssetTag);
         } catch (SystemException e) {
-            log.trace(e);
+            log.info("Can't get List of AssetTag from AssetTagLocalServiceUtil.");
+            log.error(e);
         }
         if (assetTags != null) {
             for (AssetTag assetTag : assetTags) {
@@ -236,7 +241,8 @@ public class JournalArticleDTOLocalServiceUtil {
                         resourcePrimKeyList.add(resourcePrimaryKey);
                     }
                 } catch (SystemException e) {
-                    log.trace(e);
+                    log.info("Can't get List of AssetEntry by tagId " + assetTag.getTagId() + ".");
+                    log.error(e);
                 }
             }
         }

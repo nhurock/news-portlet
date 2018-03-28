@@ -48,8 +48,9 @@ public class JournalArticleMap {
                 categories.add(assetCategory.getName());
             }
             journalArticleDTO.setCategory(categories);
-        } catch (SystemException | PortalException e) {
-            log.trace(e);
+        } catch (PortalException | SystemException e) {
+            log.info("Problem with AssetEntry, AssetTag, AssetCategory.");
+            log.error(e);
         }
         return journalArticleDTO;
     }

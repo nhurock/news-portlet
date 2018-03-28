@@ -26,7 +26,9 @@ public class LocalisationLocalServiceUtil {
         try {
             journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(journalArticleDTO.getGroupId(), journalArticleDTO.getArticleId());
         } catch (PortalException | SystemException e) {
-            log.trace(e);
+            log.info("Can't get JournalArticles last version by groupId " + journalArticleDTO.getGroupId() +
+                    " and articleId " + journalArticleDTO.getArticleId() + ".");
+            log.error(e);
         }
 
         if (journalArticle != null) {
