@@ -17,9 +17,9 @@ import java.util.Locale;
 /**
  * Переводит поля {@link ru.news.model.JournalArticleDTO} title и content к пользовательскому языку.
  */
-public class LocalisationService {
+public class LocalisationLocalServiceUtil {
 
-    private static Log log = LogFactoryUtil.getLog(LocalisationService.class);
+    private static Log log = LogFactoryUtil.getLog(LocalisationLocalServiceUtil.class);
 
     public static void localize(JournalArticleDTO journalArticleDTO, Locale locale) {
         JournalArticle journalArticle = null;
@@ -42,7 +42,7 @@ public class LocalisationService {
         }
     }
 
-    static void localize(List<JournalArticleDTO> journalArticleDTOS, Locale locale) {
+    public static void localize(List<JournalArticleDTO> journalArticleDTOS, Locale locale) {
         for (JournalArticleDTO journalArticleDTO : journalArticleDTOS) {
             localize(journalArticleDTO, locale);
         }

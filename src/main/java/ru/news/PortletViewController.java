@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import ru.news.model.JournalArticleDTO;
 import ru.news.service.JournalArticleDTOLocalServiceUtil;
-import ru.news.service.LocalisationService;
+import ru.news.service.LocalisationLocalServiceUtil;
 
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -32,7 +32,7 @@ public class PortletViewController {
         String article = request.getParameter("articleId");
         JournalArticleDTO journalArticleDTO = JournalArticleDTOLocalServiceUtil.getLatestVersion(groupId, article);
 
-        LocalisationService.localize(journalArticleDTO, request.getLocale());
+        LocalisationLocalServiceUtil.localize(journalArticleDTO, request.getLocale());
 
         model.addAttribute("news", journalArticleDTO);
         return PAGE_NEWS;

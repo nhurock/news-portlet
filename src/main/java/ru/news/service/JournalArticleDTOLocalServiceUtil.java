@@ -16,6 +16,7 @@ import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
+import org.springframework.beans.factory.annotation.Value;
 import ru.news.comparator.JournalArticleDTOComparator;
 import ru.news.mapper.JournalArticleMap;
 import ru.news.model.JournalArticleDTO;
@@ -119,7 +120,7 @@ public class JournalArticleDTOLocalServiceUtil {
     /**
      * Возращает true если запись имеент статус Expired
      */
-    private static Boolean isExpired(JournalArticleDTO journalArticleDTO) {
+    private static boolean isExpired(JournalArticleDTO journalArticleDTO) {
         JournalArticle journalArticle = null;
         try {
             journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(journalArticleDTO.getGroupId(), journalArticleDTO.getArticleId());
@@ -211,7 +212,7 @@ public class JournalArticleDTOLocalServiceUtil {
         }
 
 //         Локализация контента
-        LocalisationService.localize(journalArticles, locale);
+        LocalisationLocalServiceUtil.localize(journalArticles, locale);
         return journalArticles;
     }
 
