@@ -37,7 +37,7 @@
 
 <aui:form method="POST" action="<%= portletURLString %>">
     <liferay-ui:search-container searchContainer="<%= articleDTOSearchContainer%>">
-        <liferay-ui:search-form page="/WEB-INF/jsp/newsblock-mvcportlet/search.jsp"
+        <liferay-ui:search-form page="/jsp/newsblock-mvcportlet/search.jsp"
                                 servletContext="<%= application %>"/>
         <liferay-ui:search-container-results
                 results="<%= JournalArticleDTOLocalServiceUtil.getJournalArticles(displayTerms, articleDTOSearchContainer.getStart(), articleDTOSearchContainer.getEnd()) %>"
@@ -47,7 +47,7 @@
         <liferay-ui:search-container-row className="ru.news.model.JournalArticleDTO" modelVar="news">
 
             <portlet:renderURL var="getViewNewsURL" windowState="normal">
-                <portlet:param name="action" value="$<%= PortletViewController.RENDER_SINGLE_NEWS%>"/>
+                <portlet:param name="action" value="<%= PortletViewController.RENDER_SINGLE_NEWS%>"/>
                 <portlet:param name="groupId" value="${news.groupId}"/>
                 <portlet:param name="articleId" value="${news.articleId}"/>
             </portlet:renderURL>

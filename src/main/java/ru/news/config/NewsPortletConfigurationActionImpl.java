@@ -10,7 +10,7 @@ import javax.portlet.*;
 public class NewsPortletConfigurationActionImpl implements ConfigurationAction {
 
     public static final String ENABLE_ARCHIVE_NEWS = "enableArchiveNews";
-    private static final String PAGE_CONFIGURATION = "/WEB-INF/jsp/newsblock-mvcportlet/configuration.jsp";
+    private static final String PAGE_CONFIGURATION = "/jsp/newsblock-mvcportlet/configuration.jsp";
 
     @Override
     public void processAction(PortletConfig portletConfig, ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
