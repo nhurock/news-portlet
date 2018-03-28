@@ -128,7 +128,7 @@ public class JournalArticleDTOLocalServiceUtil {
                 }
 
                 if (!Validator.isBlank(displayTerms.getTitle())) {
-                    junctionJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_TITLE).like("%" + displayTerms.getTitle() + "%"));
+                    junctionJournalArticle.add(RestrictionsFactoryUtil.ilike(PROPERTY_TITLE, "%" + displayTerms.getKeywords() + "%"));
                 }
                 String tagName = displayTerms.getTag();
                 if (!Validator.isBlank(tagName)) {
@@ -151,8 +151,8 @@ public class JournalArticleDTOLocalServiceUtil {
 //                 Поиск по основному полю
                 junctionJournalArticle = RestrictionsFactoryUtil.conjunction();
                 Junction disjunction = RestrictionsFactoryUtil.disjunction();
-                disjunction.add(PropertyFactoryUtil.forName(PROPERTY_TITLE).like("%" + displayTerms.getKeywords() + "%"));
-                disjunction.add(PropertyFactoryUtil.forName(PROPERTY_CONTENT).like("%" + displayTerms.getKeywords() + "%"));
+                disjunction.add(RestrictionsFactoryUtil.ilike(PROPERTY_TITLE, "%" + displayTerms.getKeywords() + "%"));
+                disjunction.add(RestrictionsFactoryUtil.ilike(PROPERTY_CONTENT, "%" + displayTerms.getKeywords() + "%"));
                 junctionJournalArticle.add(disjunction);
             }
 
@@ -181,7 +181,7 @@ public class JournalArticleDTOLocalServiceUtil {
         ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
         DynamicQuery dynamicQueryAssetCategories = DynamicQueryFactoryUtil.forClass(AssetCategory.class, "assetCategories", classLoader);
         Junction junctionAssetCategories = RestrictionsFactoryUtil.disjunction();
-        junctionAssetCategories.add(PropertyFactoryUtil.forName(PROPERTY_NAME).like(categoriesName));
+        junctionAssetCategories.add(RestrictionsFactoryUtil.ilike(PROPERTY_NAME, categoriesName));
         dynamicQueryAssetCategories.add(junctionAssetCategories);
         List<AssetCategory> assetCategories = new ArrayList<>();
         List<Long> resourcePrimKeyList = new ArrayList<>();
@@ -217,7 +217,7 @@ public class JournalArticleDTOLocalServiceUtil {
         ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
         DynamicQuery dynamicQueryAssetTag = DynamicQueryFactoryUtil.forClass(AssetTag.class, "assetTag", classLoader);
         Junction junctionAssetTag = RestrictionsFactoryUtil.disjunction();
-        junctionAssetTag.add(PropertyFactoryUtil.forName(PROPERTY_NAME).like(tagName));
+        junctionAssetTag.add(RestrictionsFactoryUtil.ilike(PROPERTY_NAME, tagName));
         dynamicQueryAssetTag.add(junctionAssetTag);
         List<AssetTag> assetTags = new ArrayList<>();
         List<Long> resourcePrimKeyList = new ArrayList<>();
