@@ -17,7 +17,7 @@
 
 <aui:form method="post" action="<%=configurationURL%>">
     <label>
-        <liferay-ui:message key="labelinfo"/>:
+        <liferay-ui:message key="portlet.configuration.label.view-archive-news"/>:
         <c:choose>
             <c:when test="<%= showArchiveNewsFlag%>">
                 <input class="${NewsPortletConfigurationActionImpl.ENABLE_ARCHIVE_NEWS}" type="checkbox" checked=""
@@ -29,5 +29,5 @@
             </c:otherwise>
         </c:choose>
     </label>
-    <button type="submit"><liferay-ui:message key="buttonsave"/></button>
+    <button type="submit"><liferay-ui:message key="portlet.configuration.button.save-view-archive-news"/></button>
 </aui:form>
