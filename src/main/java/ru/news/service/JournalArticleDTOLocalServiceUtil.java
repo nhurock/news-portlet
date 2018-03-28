@@ -8,6 +8,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetTag;
@@ -16,13 +17,14 @@ import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
-import org.springframework.beans.factory.annotation.Value;
-import ru.news.comparator.JournalArticleDTOComparator;
 import ru.news.mapper.JournalArticleMap;
 import ru.news.model.JournalArticleDTO;
 import ru.news.search.JournalArticleDTODisplayTerms;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 public class JournalArticleDTOLocalServiceUtil {
 
@@ -30,30 +32,8 @@ public class JournalArticleDTOLocalServiceUtil {
     private static final String PROPERTY_RESOURCE_PRIM_KEY = "resourcePrimKey";
     private static final String PROPERTY_CONTENT = "content";
     private static final String PROPERTY_NAME = "name";
+    private static final String PROPERTY_STATUS = "status";
     private static Log log = LogFactoryUtil.getLog(JournalArticleDTOLocalServiceUtil.class);
-
-    /**
-     * Удаяет архивные записи из коллекции
-     *
-     * @param journalArticleDTOS список новстей.
-     */
-    private static void deleteExpiredJournalArticles(List<JournalArticleDTO> journalArticleDTOS) {
-        ListIterator<JournalArticleDTO> iterator = journalArticleDTOS.listIterator();
-        while (iterator.hasNext()) {
-            if (isExpired(iterator.next())) {
-                iterator.remove();
-            }
-        }
-    }
-
-    /**
-     * Возвращает список актуальных {@link JournalArticleDTO} cо статусом Approved и Expired
-     */
-    private static List<JournalArticleDTO> getApprovedAndExpiredJournalArticlesLatestVersion() {
-        List<JournalArticleDTO> journalArticleDTOS = getLatestVersionApprovedAndExpiredJournalArticles();
-        journalArticleDTOS.sort(new JournalArticleDTOComparator().reversed());
-        return journalArticleDTOS;
-    }
 
     /**
      * Возвращает последнюю версию WebContent {@link JournalArticleDTO}
@@ -97,40 +77,6 @@ public class JournalArticleDTOLocalServiceUtil {
     }
 
     /**
-     * Возвращает список актуальных {@link JournalArticle} со статусом Approved и Expired
-     */
-    private static List<JournalArticleDTO> getLatestVersionApprovedAndExpiredJournalArticles() {
-        HashMap<String, JournalArticleDTO> journalArticleHashMap = new HashMap<>();
-        try {
-            for (JournalArticle journalArticle : JournalArticleLocalServiceUtil.getArticles()) {
-                String articleId = journalArticle.getArticleId();
-                long groupId = journalArticle.getGroupId();
-
-                if (!journalArticle.isInTrash() && (journalArticle.isApproved() || journalArticle.isExpired()))
-                    if (!journalArticleHashMap.containsKey(articleId)) {
-                        journalArticleHashMap.put(articleId, getLatestVersion(groupId, articleId));
-                    }
-            }
-        } catch (SystemException e) {
-            log.trace(e);
-        }
-        return new ArrayList<>(journalArticleHashMap.values());
-    }
-
-    /**
-     * Возращает true если запись имеент статус Expired
-     */
-    private static boolean isExpired(JournalArticleDTO journalArticleDTO) {
-        JournalArticle journalArticle = null;
-        try {
-            journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(journalArticleDTO.getGroupId(), journalArticleDTO.getArticleId());
-        } catch (PortalException | SystemException e) {
-            log.trace(e);
-        }
-        return journalArticle != null && journalArticle.isExpired();
-    }
-
-    /**
      * Возвращает список новостей из поиска, список фиксированного размера
      *
      * @param displayTerms параметры запроса
@@ -161,12 +107,18 @@ public class JournalArticleDTOLocalServiceUtil {
         List<JournalArticleDTO> journalArticles;
         Locale locale = displayTerms.getLocale();
         ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
+        DynamicQuery dynamicQueryJournalArticle = DynamicQueryFactoryUtil.forClass(JournalArticle.class, "journalArticle", classLoader);
+        Junction junctionJournalArticle;
         if (Validator.isBlank(displayTerms.getKeywords()) && (!displayTerms.isAdvancedSearch())) {
 //            Получения данных без фильтров поиска
-            journalArticles = JournalArticleDTOLocalServiceUtil.getApprovedAndExpiredJournalArticlesLatestVersion();
+            junctionJournalArticle = RestrictionsFactoryUtil.disjunction();
+            if (displayTerms.getEnableArchiveNews()) {
+                junctionJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_STATUS).eq(WorkflowConstants.STATUS_EXPIRED));
+            }
+            junctionJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_STATUS).eq(WorkflowConstants.STATUS_APPROVED));
+            dynamicQueryJournalArticle.add(junctionJournalArticle);
+            journalArticles = JournalArticleDTOLocalServiceUtil.getDynamicQuery(dynamicQueryJournalArticle);
         } else {
-            DynamicQuery dynamicQueryJournalArticle = DynamicQueryFactoryUtil.forClass(JournalArticle.class, "journalArticle", classLoader);
-            Junction junctionJournalArticle;
 //            Расширенный поиск
             if (displayTerms.isAdvancedSearch()) {
                 if (displayTerms.isAndOperator()) {
@@ -197,18 +149,22 @@ public class JournalArticleDTOLocalServiceUtil {
 
             } else {
 //                 Поиск по основному полю
-                junctionJournalArticle = RestrictionsFactoryUtil.disjunction();
-                junctionJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_TITLE).like("%" + displayTerms.getKeywords() + "%"));
-                junctionJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_CONTENT).like("%" + displayTerms.getKeywords() + "%"));
+                junctionJournalArticle = RestrictionsFactoryUtil.conjunction();
+                Junction disjunction = RestrictionsFactoryUtil.disjunction();
+                disjunction.add(PropertyFactoryUtil.forName(PROPERTY_TITLE).like("%" + displayTerms.getKeywords() + "%"));
+                disjunction.add(PropertyFactoryUtil.forName(PROPERTY_CONTENT).like("%" + displayTerms.getKeywords() + "%"));
+                junctionJournalArticle.add(disjunction);
             }
-            dynamicQueryJournalArticle.add(junctionJournalArticle);
-            journalArticles = JournalArticleDTOLocalServiceUtil.getDynamicQuery(dynamicQueryJournalArticle);
-        }
 
 //         Фильтрация контента по контенту
-        if (!displayTerms.getEnableArchiveNews()) {
-//          Удаление архивных новостей
-            JournalArticleDTOLocalServiceUtil.deleteExpiredJournalArticles(journalArticles);
+            Junction filteredJunction = RestrictionsFactoryUtil.disjunction();
+            if (displayTerms.getEnableArchiveNews()) {
+                filteredJunction.add(PropertyFactoryUtil.forName(PROPERTY_STATUS).eq(WorkflowConstants.STATUS_EXPIRED));
+            }
+            filteredJunction.add(PropertyFactoryUtil.forName(PROPERTY_STATUS).eq(WorkflowConstants.STATUS_APPROVED));
+            junctionJournalArticle.add(filteredJunction);
+            dynamicQueryJournalArticle.add(junctionJournalArticle);
+            journalArticles = JournalArticleDTOLocalServiceUtil.getDynamicQuery(dynamicQueryJournalArticle);
         }
 
 //         Локализация контента
