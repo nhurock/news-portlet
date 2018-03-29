@@ -21,7 +21,9 @@ public class JournalArticleMap {
     private static Log log = LogFactoryUtil.getLog(JournalArticleMap.class);
 
     public static JournalArticleDTO toDto(JournalArticle journalArticle) {
-        if (journalArticle == null) return null;
+        if (journalArticle == null) {
+            throw new IllegalArgumentException("Can't convert null JournalArticle.");
+        }
 
         JournalArticleDTO journalArticleDTO = new JournalArticleDTO();
 
@@ -56,7 +58,9 @@ public class JournalArticleMap {
     }
 
     public static List<JournalArticleDTO> toDto(List<JournalArticle> journalArticles) {
-        if (journalArticles == null) return null;
+        if (journalArticles == null) {
+            throw new IllegalArgumentException("Can't convert null List<JournalArticle>.");
+        }
 
         List<JournalArticleDTO> journalArticleDTOS = new ArrayList<>();
         for (JournalArticle journalArticle : journalArticles) {

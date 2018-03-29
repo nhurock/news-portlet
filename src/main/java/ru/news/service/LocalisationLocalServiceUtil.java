@@ -22,6 +22,9 @@ public class LocalisationLocalServiceUtil {
     private static Log log = LogFactoryUtil.getLog(LocalisationLocalServiceUtil.class);
 
     public static void localize(JournalArticleDTO journalArticleDTO, Locale locale) {
+        if (journalArticleDTO == null) {
+            throw new IllegalArgumentException("Can't localize null journalArticleDTO.");
+        }
         JournalArticle journalArticle = null;
         try {
             journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(journalArticleDTO.getGroupId(), journalArticleDTO.getArticleId());
@@ -31,20 +34,25 @@ public class LocalisationLocalServiceUtil {
             log.error(e);
         }
 
-        if (journalArticle != null) {
-            String languageIdDefault = GetterUtil.get(locale.toString(), journalArticle.getDefaultLanguageId());
-            Locale localeDefault = LanguageUtil.getLocale(languageIdDefault);
-
-            String title = journalArticle.getTitle(localeDefault);
-            String xmlContent = journalArticle.getContentByLocale(languageIdDefault);
-            String content = JournalArticleContentSAXMap.getContent(xmlContent);
-
-            journalArticleDTO.setTitle(title);
-            journalArticleDTO.setContent(content);
+        if (journalArticle == null) {
+            throw new IllegalArgumentException("No journalArticle with groupId " + journalArticleDTO.getGroupId() + " and articleId " + journalArticleDTO.getArticleId() + ".");
         }
+
+        String languageIdDefault = GetterUtil.get(locale.toString(), journalArticle.getDefaultLanguageId());
+        Locale localeDefault = LanguageUtil.getLocale(languageIdDefault);
+
+        String title = journalArticle.getTitle(localeDefault);
+        String xmlContent = journalArticle.getContentByLocale(languageIdDefault);
+        String content = JournalArticleContentSAXMap.getContent(xmlContent);
+
+        journalArticleDTO.setTitle(title);
+        journalArticleDTO.setContent(content);
     }
 
     public static void localize(List<JournalArticleDTO> journalArticleDTOS, Locale locale) {
+        if (journalArticleDTOS == null) {
+            throw new IllegalArgumentException("Can't localize null List<JournalArticleDTO>.");
+        }
         for (JournalArticleDTO journalArticleDTO : journalArticleDTOS) {
             localize(journalArticleDTO, locale);
         }

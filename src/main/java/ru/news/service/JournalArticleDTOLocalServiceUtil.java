@@ -42,6 +42,9 @@ public class JournalArticleDTOLocalServiceUtil {
      * @param groupId   groupId {@link JournalArticle}
      */
     public static JournalArticleDTO getLatestVersion(long groupId, String articleId) {
+        if ((groupId == 0) || (articleId == null)) {
+            throw new IllegalArgumentException("Can't get latest version journal article by groupId " + groupId + " and articleId " + articleId);
+        }
         JournalArticle journalArticle = null;
         try {
             journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(groupId, articleId);
@@ -58,6 +61,9 @@ public class JournalArticleDTOLocalServiceUtil {
      * @param dynamicQuery для поиска {@link JournalArticle}
      */
     private static List<JournalArticleDTO> getDynamicQuery(DynamicQuery dynamicQuery) {
+        if (dynamicQuery == null) {
+            throw new IllegalArgumentException("Empty DynamicQuery.");
+        }
         List<JournalArticle> dynamicQuery1 = null;
         try {
             dynamicQuery1 = JournalArticleLocalServiceUtil.dynamicQuery(dynamicQuery);
@@ -66,7 +72,9 @@ public class JournalArticleDTOLocalServiceUtil {
             log.error(e);
         }
 
-        if (dynamicQuery1 == null) return null;
+        if (dynamicQuery1 == null) {
+            throw new IllegalArgumentException("Can't get List<JournalArticle> from null DynamicQuery.");
+        }
 
         HashMap<String, JournalArticleDTO> journalArticleHashMap = new HashMap<>();
         for (JournalArticle journalArticle : dynamicQuery1) {
@@ -86,8 +94,13 @@ public class JournalArticleDTOLocalServiceUtil {
      * @param end          номер последней записи
      */
     public static List<JournalArticleDTO> getJournalArticles(JournalArticleDTODisplayTerms displayTerms, int start, int end) {
+        if (displayTerms == null) {
+            throw new IllegalArgumentException("Can't get JournalArticle with null JournalArticleDTODisplayTerms.");
+        }
         List<JournalArticleDTO> articleDTOS = getJournalArticleData(displayTerms);
-        if (articleDTOS == null) return null;
+        if (articleDTOS == null) {
+            throw new IllegalArgumentException("Haven't JournalArticle's data from search.");
+        }
         return ListUtil.subList(articleDTOS, start, end);
     }
 
@@ -95,6 +108,9 @@ public class JournalArticleDTOLocalServiceUtil {
      * Возвращает количество записей
      */
     public static int getTotalJournalArticleCount(JournalArticleDTODisplayTerms displayTerms) {
+        if (displayTerms == null) {
+            throw new IllegalArgumentException("Can't get data's count with null JournalArticleDTODisplayTerms.");
+        }
         List<JournalArticleDTO> journalArticleData = getJournalArticleData(displayTerms);
         if (journalArticleData == null) return 0;
         return journalArticleData.size();
@@ -106,6 +122,9 @@ public class JournalArticleDTOLocalServiceUtil {
      * @param displayTerms параметры поиска
      */
     private static List<JournalArticleDTO> getJournalArticleData(JournalArticleDTODisplayTerms displayTerms) {
+        if (displayTerms == null) {
+            throw new IllegalArgumentException("Can't get List<JournalArticle> with null JournalArticleDTODisplayTerms.");
+        }
         List<JournalArticleDTO> journalArticles;
         Locale locale = displayTerms.getLocale();
         ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
@@ -180,6 +199,9 @@ public class JournalArticleDTOLocalServiceUtil {
      * @param categoriesName имя категории
      */
     private static List<Long> getJournalArticlesResourcePrimKeysByCategories(String categoriesName) {
+        if (categoriesName == null) {
+            throw new IllegalArgumentException("Can't get PrimKeys by null categories name.");
+        }
         ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
         DynamicQuery dynamicQueryAssetCategories = DynamicQueryFactoryUtil.forClass(AssetCategory.class, "assetCategories", classLoader);
         Junction junctionAssetCategories = RestrictionsFactoryUtil.disjunction();
@@ -218,6 +240,9 @@ public class JournalArticleDTOLocalServiceUtil {
      * @param tagName имя тэга новости
      */
     private static List<Long> getJournalArticlesResourcePrimKeysByTag(String tagName) {
+        if (tagName == null) {
+            throw new IllegalArgumentException("Can't get PrimKeys by null tag's name.");
+        }
         ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
         DynamicQuery dynamicQueryAssetTag = DynamicQueryFactoryUtil.forClass(AssetTag.class, "assetTag", classLoader);
         Junction junctionAssetTag = RestrictionsFactoryUtil.disjunction();
