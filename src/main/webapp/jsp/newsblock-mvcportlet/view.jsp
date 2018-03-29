@@ -36,7 +36,7 @@
 </liferay-portlet:renderURL>
 
 <aui:form method="POST" action="<%= portletURLString %>">
-    <liferay-ui:search-container searchContainer="<%= articleDTOSearchContainer%>">
+    <liferay-ui:search-container searchContainer="<%= articleDTOSearchContainer%>" emptyResultsMessage="search-container.empty-result-message">
         <liferay-ui:search-form page="/jsp/newsblock-mvcportlet/search.jsp"
                                 servletContext="<%= application %>"/>
         <liferay-ui:search-container-results
