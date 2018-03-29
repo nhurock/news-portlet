@@ -1,6 +1,5 @@
 <%@ page import="com.liferay.portal.kernel.util.GetterUtil" %>
-<%@ page import="ru.news.PortletViewController" %>
-<%@ page import="ru.news.config.NewsPortletConfigurationActionImpl" %>
+<%@ page import="ru.news.NewsPortletConstant" %>
 <%@ page import="ru.news.search.JournalArticleDTODisplayTerms" %>
 <%@ page import="ru.news.search.JournalArticleDTOSearchContainer" %>
 <%@ page import="ru.news.service.JournalArticleDTOLocalServiceUtil" %>
@@ -19,7 +18,7 @@
 <theme:defineObjects/>
 
 <%
-    String showArchiveNews = portletPreferences.getValue(NewsPortletConfigurationActionImpl.ENABLE_ARCHIVE_NEWS, "");
+    String showArchiveNews = portletPreferences.getValue(NewsPortletConstant.ENABLE_ARCHIVE_NEWS, "");
     Boolean showArchiveNewsFlag = GetterUtil.getBoolean(showArchiveNews);
 
     PortletURL portletURL = renderResponse.createRenderURL();
@@ -31,13 +30,10 @@
     displayTerms.setLocale(user.getLocale());
 %>
 
-<liferay-portlet:renderURL varImpl="iteratorURL">
-    <portlet:param name="mvcPath" value="view.jsp"/>
-</liferay-portlet:renderURL>
-
 <aui:form method="POST" action="<%= portletURLString %>">
-    <liferay-ui:search-container searchContainer="<%= articleDTOSearchContainer%>" emptyResultsMessage="search-container.empty-result-message">
-        <liferay-ui:search-form page="/jsp/newsblock-mvcportlet/search.jsp"
+    <liferay-ui:search-container searchContainer="<%= articleDTOSearchContainer%>"
+                                 emptyResultsMessage="search-container.empty-result-message">
+        <liferay-ui:search-form page="<%= NewsPortletConstant.PAGE_SEARCH%>"
                                 servletContext="<%= application %>"/>
         <liferay-ui:search-container-results
                 results="<%= JournalArticleDTOLocalServiceUtil.getJournalArticles(displayTerms, articleDTOSearchContainer.getStart(), articleDTOSearchContainer.getEnd()) %>"
@@ -47,14 +43,17 @@
         <liferay-ui:search-container-row className="ru.news.model.JournalArticleDTO" modelVar="news">
 
             <portlet:renderURL var="getViewNewsURL" windowState="normal">
-                <portlet:param name="action" value="<%= PortletViewController.RENDER_SINGLE_NEWS%>"/>
+                <portlet:param name="action" value="<%= NewsPortletConstant.RENDER_SINGLE_NEWS%>"/>
                 <portlet:param name="groupId" value="${news.groupId}"/>
                 <portlet:param name="articleId" value="${news.articleId}"/>
             </portlet:renderURL>
 
-            <liferay-ui:search-container-column-text href="${getViewNewsURL}" name="search-container-column-text.label.title"  property="title"/>
-            <liferay-ui:search-container-column-text name="search-container-column-text.label.content" property="content"/>
-            <liferay-ui:search-container-column-text name="search-container-column-text.label.date" property="publishDate"/>
+            <liferay-ui:search-container-column-text href="${getViewNewsURL}"
+                                                     name="search-container-column-text.label.title" property="title"/>
+            <liferay-ui:search-container-column-text name="search-container-column-text.label.content"
+                                                     property="content"/>
+            <liferay-ui:search-container-column-text name="search-container-column-text.label.date"
+                                                     property="publishDate"/>
 
         </liferay-ui:search-container-row>
         <liferay-ui:search-iterator/>

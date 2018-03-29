@@ -1,5 +1,5 @@
 <%@ page import="com.liferay.portal.kernel.util.GetterUtil" %>
-<%@ page import="ru.news.config.NewsPortletConfigurationActionImpl" %>
+<%@ page import="ru.news.NewsPortletConstant" %>
 <%@ taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %>
 <%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
@@ -9,7 +9,8 @@
 <liferay-portlet:actionURL var="configurationURL" portletConfiguration="true"/>
 <portlet:defineObjects/>
 <%
-    String showArchiveNews = portletPreferences.getValue(NewsPortletConfigurationActionImpl.ENABLE_ARCHIVE_NEWS, "");
+    String enableArchiveNews = NewsPortletConstant.ENABLE_ARCHIVE_NEWS;
+    String showArchiveNews = portletPreferences.getValue(enableArchiveNews, "");
     Boolean showArchiveNewsFlag = GetterUtil.getBoolean(showArchiveNews);
 %>
 
@@ -20,11 +21,11 @@
         <liferay-ui:message key="portlet.configuration.label.view-archive-news"/>:
         <c:choose>
             <c:when test="<%= showArchiveNewsFlag%>">
-                <input class="${NewsPortletConfigurationActionImpl.ENABLE_ARCHIVE_NEWS}" type="checkbox" checked=""
+                <input class="<%=enableArchiveNews%>" type="checkbox" checked=""
                        name='<portlet:namespace/>enableArchiveNews'>
             </c:when>
             <c:otherwise>
-                <input class="${NewsPortletConfigurationActionImpl.ENABLE_ARCHIVE_NEWS}" type="checkbox"
+                <input class="<%=enableArchiveNews%>" type="checkbox"
                        name='<portlet:namespace/>enableArchiveNews'>
             </c:otherwise>
         </c:choose>

@@ -15,10 +15,9 @@ import javax.portlet.RenderResponse;
 @RequestMapping("VIEW")
 public class PortletViewController {
 
-    public static final String RENDER_SINGLE_NEWS = "renderSingleNews";
     private static final String PAGE_VIEW = "newsblock-mvcportlet/view";
     private static final String PAGE_NEWS = "newsblock-mvcportlet/news";
-    private static final String ACTION_RENDER_SINGLE_NEWS = "action=" + RENDER_SINGLE_NEWS;
+    private static final String ACTION_RENDER_SINGLE_NEWS = "action=" + NewsPortletConstant.RENDER_SINGLE_NEWS;
 
     @RenderMapping
     public String renderMainView(Model model) {
