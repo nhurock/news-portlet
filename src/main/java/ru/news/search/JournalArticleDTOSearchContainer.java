@@ -1,6 +1,7 @@
 package ru.news.search;
 
 import com.liferay.portal.kernel.dao.search.SearchContainer;
+import ru.news.NewsPortletConstant;
 import ru.news.model.JournalArticleDTO;
 
 import javax.portlet.PortletRequest;
@@ -14,7 +15,7 @@ public class JournalArticleDTOSearchContainer extends SearchContainer<JournalArt
     private static final String TITLE = "title";
     private static final String TAG = "tag";
     private static final String CATEGORY = "category";
-    private static final String ENABLE_ARCHIVE_NEWS = "enableArchiveNews";
+
     private static final List<String> HEADER_NAMES = null;
 
     public JournalArticleDTOSearchContainer(PortletRequest portletRequest, PortletURL iteratorURL) {
@@ -23,6 +24,5 @@ public class JournalArticleDTOSearchContainer extends SearchContainer<JournalArt
         iteratorURL.setParameter(TITLE, displayTerms.getTitle());
         iteratorURL.setParameter(TAG, displayTerms.getTag());
         iteratorURL.setParameter(CATEGORY, displayTerms.getCategory());
-        iteratorURL.setParameter(ENABLE_ARCHIVE_NEWS, String.valueOf(displayTerms.getEnableArchiveNews()));
     }
 }
