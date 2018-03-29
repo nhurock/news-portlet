@@ -5,7 +5,7 @@
 
 <%@include file="init.jsp" %>
 
-<a href="<portlet:renderURL />">&laquo;Home</a>
+<a href="<portlet:renderURL />">&laquo; <liferay-ui:message key="portlet.navigation.label.home"/> </a>
 
 <b><%--@elvariable id="news" type="ru.news.model.JournalArticleDTO"--%>
     <c:out value="${news.title}"/></b>

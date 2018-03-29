@@ -52,9 +52,9 @@
                 <portlet:param name="articleId" value="${news.articleId}"/>
             </portlet:renderURL>
 
-            <liferay-ui:search-container-column-text href="${getViewNewsURL}" name="Title" property="title"/>
-            <liferay-ui:search-container-column-text name="Content" property="content"/>
-            <liferay-ui:search-container-column-text name="Date" property="publishDate"/>
+            <liferay-ui:search-container-column-text href="${getViewNewsURL}" name="search-container-column-text.label.title"  property="title"/>
+            <liferay-ui:search-container-column-text name="search-container-column-text.label.content" property="content"/>
+            <liferay-ui:search-container-column-text name="search-container-column-text.label.date" property="publishDate"/>
 
         </liferay-ui:search-container-row>
         <liferay-ui:search-iterator/>

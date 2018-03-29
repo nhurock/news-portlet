@@ -10,8 +10,8 @@
     JournalArticleDTODisplayTerms displayTerms = (JournalArticleDTODisplayTerms) searchContainer.getDisplayTerms();
 %>
 
-<liferay-ui:search-toggle buttonLabel="Search" displayTerms="<%= displayTerms %>" id="toggle_id_news_search">
-    <aui:input label="Title" name="title" value="<%=displayTerms.getTitle() %>"/>
-    <aui:input label="Tag" name="tag" value="<%=displayTerms.getTag() %>"/>
-    <aui:input label="Categroy" name="category" value="<%=displayTerms.getCategory() %>"/>
+<liferay-ui:search-toggle buttonLabel="search-toggle.label.search-button.title" displayTerms="<%= displayTerms %>" id="toggle_id_news_search">
+    <aui:input label="search-toggle.label.title" name="title" value="<%=displayTerms.getTitle() %>"/>
+    <aui:input label="search-toggle.label.tag" name="tag" value="<%=displayTerms.getTag() %>"/>
+    <aui:input label="search-toggle.label.category" name="category" value="<%=displayTerms.getCategory() %>"/>
 </liferay-ui:search-toggle>

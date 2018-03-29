@@ -13,7 +13,7 @@
     Boolean showArchiveNewsFlag = GetterUtil.getBoolean(showArchiveNews);
 %>
 
-<liferay-ui:success key="config-stored" message="Configuration Saved Successfully"/>
+<liferay-ui:success key="config-stored" message="portlet.configuration.label.configuration-saved-success"/>
 
 <aui:form method="post" action="<%=configurationURL%>">
     <label>
