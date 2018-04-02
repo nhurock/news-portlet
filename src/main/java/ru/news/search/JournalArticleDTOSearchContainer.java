@@ -1,7 +1,6 @@
 package ru.news.search;
 
 import com.liferay.portal.kernel.dao.search.SearchContainer;
-import ru.news.NewsPortletConstant;
 import ru.news.model.JournalArticleDTO;
 
 import javax.portlet.PortletRequest;
@@ -10,7 +9,7 @@ import java.util.List;
 
 public class JournalArticleDTOSearchContainer extends SearchContainer<JournalArticleDTO> {
 
-    private static final String EMPTY_RESULT_MESSAGE = "No records";
+    private static final String EMPTY_RESULT_MESSAGE = null;
     private static final int DELTA = 5;
     private static final String TITLE = "title";
     private static final String TAG = "tag";
