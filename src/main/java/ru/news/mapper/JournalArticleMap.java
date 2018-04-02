@@ -40,19 +40,25 @@ public class JournalArticleMap {
         try {
             AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(journalArticle.getGroupId(), journalArticle.getArticleResourceUuid());
             List<AssetTag> assetEntryAssetTags = AssetTagLocalServiceUtil.getAssetEntryAssetTags(assetEntry.getEntryId());
-            for (AssetTag assetTag : assetEntryAssetTags) {
-                tags.add(assetTag.getName());
+            if (!assetEntryAssetTags.isEmpty()) {
+                log.info("Get List<AssetTag> by assetEntryId " + assetEntry.getEntryId());
+                for (AssetTag assetTag : assetEntryAssetTags) {
+                    tags.add(assetTag.getName());
+                }
             }
             journalArticleDTO.setTags(tags);
 
             List<AssetCategory> assetCategories = AssetCategoryLocalServiceUtil.getCategories(JournalArticle.class.getName(), journalArticle.getResourcePrimKey());
-            for (AssetCategory assetCategory : assetCategories) {
-                categories.add(assetCategory.getName());
+            if (!assetCategories.isEmpty()) {
+                log.info("Get List<AssetCategory> by className " + JournalArticle.class.getSimpleName() + " and resourcePrimKey " + journalArticle.getResourcePrimKey());
+                for (AssetCategory assetCategory : assetCategories) {
+                    categories.add(assetCategory.getName());
+                }
             }
             journalArticleDTO.setCategory(categories);
+
         } catch (PortalException | SystemException e) {
-            log.info("Problem with AssetEntry, AssetTag, AssetCategory.");
-            log.error(e);
+            log.error("Problem with AssetEntry, AssetTag, AssetCategory." + e);
         }
         return journalArticleDTO;
     }

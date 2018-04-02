@@ -49,6 +49,7 @@ public class LocalisationLocalServiceUtil {
     }
 
     public static void localize(List<JournalArticleDTO> journalArticleDTOS, Locale locale) {
+        log.info("Localize.");
         if (journalArticleDTOS == null) {
             log.warn("Can't localize null List<JournalArticleDTO>.");
             return;
