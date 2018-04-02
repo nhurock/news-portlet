@@ -51,7 +51,8 @@ public class LocalisationLocalServiceUtil {
 
     public static void localize(List<JournalArticleDTO> journalArticleDTOS, Locale locale) {
         if (journalArticleDTOS == null) {
-            throw new IllegalArgumentException("Can't localize null List<JournalArticleDTO>.");
+            log.warn("Can't localize null List<JournalArticleDTO>.");
+            return;
         }
         for (JournalArticleDTO journalArticleDTO : journalArticleDTOS) {
             localize(journalArticleDTO, locale);
