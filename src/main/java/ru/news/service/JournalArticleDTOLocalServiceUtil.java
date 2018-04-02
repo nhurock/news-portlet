@@ -49,8 +49,7 @@ public class JournalArticleDTOLocalServiceUtil {
         try {
             journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(groupId, articleId);
         } catch (PortalException | SystemException e) {
-            log.info("Can't get JournalArticles last version by groupId " + groupId + " and articleId " + articleId + ".");
-            log.error(e);
+            log.error("Can't get JournalArticles last version by groupId " + groupId + " and articleId " + articleId + "." + e);
         }
         return JournalArticleMap.toDto(journalArticle);
     }
@@ -64,20 +63,19 @@ public class JournalArticleDTOLocalServiceUtil {
         if (dynamicQuery == null) {
             throw new IllegalArgumentException("Empty DynamicQuery.");
         }
-        List<JournalArticle> dynamicQuery1 = null;
+        List<JournalArticle> journalArticleList = null;
         try {
-            dynamicQuery1 = JournalArticleLocalServiceUtil.dynamicQuery(dynamicQuery);
+            journalArticleList = JournalArticleLocalServiceUtil.dynamicQuery(dynamicQuery);
         } catch (SystemException e) {
-            log.info("Can't get DynamicQuery from JournalArticleLocalServiceUtil.");
-            log.error(e);
+            log.error("Can't get DynamicQuery from JournalArticleLocalServiceUtil." + e);
         }
 
-        if (dynamicQuery1 == null) {
-            throw new IllegalArgumentException("Can't get List<JournalArticle> from null DynamicQuery.");
+        if (journalArticleList == null) {
+            throw new IllegalArgumentException("Can't work with null List<JournalArticle>.");
         }
 
         HashMap<String, JournalArticleDTO> journalArticleHashMap = new HashMap<>();
-        for (JournalArticle journalArticle : dynamicQuery1) {
+        for (JournalArticle journalArticle : journalArticleList) {
             String articleId = journalArticle.getArticleId();
             if (!journalArticleHashMap.containsKey(articleId)) {
                 journalArticleHashMap.put(articleId, getLatestVersion(journalArticle.getGroupId(), journalArticle.getArticleId()));
@@ -130,7 +128,8 @@ public class JournalArticleDTOLocalServiceUtil {
         ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
         DynamicQuery dynamicQueryJournalArticle = DynamicQueryFactoryUtil.forClass(JournalArticle.class, "journalArticle", classLoader);
         Junction junctionJournalArticle;
-        if (Validator.isBlank(displayTerms.getKeywords()) && (!displayTerms.isAdvancedSearch())) {
+        String displayTermsKeywords = displayTerms.getKeywords();
+        if (Validator.isBlank(displayTermsKeywords) && (!displayTerms.isAdvancedSearch())) {
 //            Получения данных без фильтров поиска
             junctionJournalArticle = RestrictionsFactoryUtil.disjunction();
             if (displayTerms.getEnableArchiveNews()) {
@@ -142,6 +141,7 @@ public class JournalArticleDTOLocalServiceUtil {
         } else {
 //            Расширенный поиск
             if (displayTerms.isAdvancedSearch()) {
+                log.info("Advanced search.");
                 if (displayTerms.isAndOperator()) {
                     junctionJournalArticle = RestrictionsFactoryUtil.conjunction();
                 } else {
@@ -149,10 +149,12 @@ public class JournalArticleDTOLocalServiceUtil {
                 }
 
                 if (!Validator.isBlank(displayTerms.getTitle())) {
-                    junctionJournalArticle.add(RestrictionsFactoryUtil.ilike(PROPERTY_TITLE, "%" + displayTerms.getKeywords() + "%"));
+                    log.info("Search by title " + displayTerms.getTitle());
+                    junctionJournalArticle.add(RestrictionsFactoryUtil.ilike(PROPERTY_TITLE, "%" + displayTermsKeywords + "%"));
                 }
                 String tagName = displayTerms.getTag();
                 if (!Validator.isBlank(tagName)) {
+                    log.info("Search by tag " + displayTerms.getTag());
                     Junction disjunction = RestrictionsFactoryUtil.disjunction();
                     for (Long resourcePrimaryKey : getJournalArticlesResourcePrimKeysByTag(tagName)) {
                         disjunction.add(PropertyFactoryUtil.forName(PROPERTY_RESOURCE_PRIM_KEY).eq(resourcePrimaryKey));
@@ -161,6 +163,7 @@ public class JournalArticleDTOLocalServiceUtil {
                 }
                 String categoryName = displayTerms.getCategory();
                 if (!Validator.isBlank(categoryName)) {
+                    log.info("Search by category " + displayTerms.getCategory());
                     Junction disjunction = RestrictionsFactoryUtil.disjunction();
                     for (Long resourcePrimKey : getJournalArticlesResourcePrimKeysByCategories(categoryName)) {
                         disjunction.add(PropertyFactoryUtil.forName(PROPERTY_RESOURCE_PRIM_KEY).eq(resourcePrimKey));
@@ -169,17 +172,19 @@ public class JournalArticleDTOLocalServiceUtil {
                 }
 
             } else {
+                log.info("Simple search by keywords " + displayTermsKeywords);
 //                 Поиск по основному полю
                 junctionJournalArticle = RestrictionsFactoryUtil.conjunction();
                 Junction disjunction = RestrictionsFactoryUtil.disjunction();
-                disjunction.add(RestrictionsFactoryUtil.ilike(PROPERTY_TITLE, "%" + displayTerms.getKeywords() + "%"));
-                disjunction.add(RestrictionsFactoryUtil.ilike(PROPERTY_CONTENT, "%" + displayTerms.getKeywords() + "%"));
+                disjunction.add(RestrictionsFactoryUtil.ilike(PROPERTY_TITLE, "%" + displayTermsKeywords + "%"));
+                disjunction.add(RestrictionsFactoryUtil.ilike(PROPERTY_CONTENT, "%" + displayTermsKeywords + "%"));
                 junctionJournalArticle.add(disjunction);
             }
 
 //         Фильтрация контента по контенту
             Junction filteredJunction = RestrictionsFactoryUtil.disjunction();
             if (displayTerms.getEnableArchiveNews()) {
+                log.info("Enable archive news.");
                 filteredJunction.add(PropertyFactoryUtil.forName(PROPERTY_STATUS).eq(WorkflowConstants.STATUS_EXPIRED));
             }
             filteredJunction.add(PropertyFactoryUtil.forName(PROPERTY_STATUS).eq(WorkflowConstants.STATUS_APPROVED));
@@ -212,8 +217,7 @@ public class JournalArticleDTOLocalServiceUtil {
         try {
             assetCategories = AssetCategoryLocalServiceUtil.dynamicQuery(dynamicQueryAssetCategories);
         } catch (SystemException e) {
-            log.info("Can't get DynamicQuery from AssetCategoryLocalServiceUtil.");
-            log.error(e);
+            log.error("Can't get DynamicQuery from AssetCategoryLocalServiceUtil. " + e);
         }
         if (assetCategories != null) {
             for (AssetCategory assetCategory : assetCategories) {
@@ -226,8 +230,7 @@ public class JournalArticleDTOLocalServiceUtil {
 
                     }
                 } catch (SystemException e) {
-                    log.info("Can't get List of AssetEntry by categoryId " + assetCategory.getCategoryId() + ".");
-                    log.error(e);
+                    log.error("Can't get List of AssetEntry by categoryId " + assetCategory.getCategoryId() + "." + e);
                 }
             }
         }
@@ -253,8 +256,7 @@ public class JournalArticleDTOLocalServiceUtil {
         try {
             assetTags = AssetTagLocalServiceUtil.dynamicQuery(dynamicQueryAssetTag);
         } catch (SystemException e) {
-            log.info("Can't get List of AssetTag from AssetTagLocalServiceUtil.");
-            log.error(e);
+            log.error("Can't get List of AssetTag from AssetTagLocalServiceUtil. " + e);
         }
         if (assetTags != null) {
             for (AssetTag assetTag : assetTags) {
@@ -266,8 +268,7 @@ public class JournalArticleDTOLocalServiceUtil {
                         resourcePrimKeyList.add(resourcePrimaryKey);
                     }
                 } catch (SystemException e) {
-                    log.info("Can't get List of AssetEntry by tagId " + assetTag.getTagId() + ".");
-                    log.error(e);
+                    log.error("Can't get List of AssetEntry by tagId " + assetTag.getTagId() + "." + e);
                 }
             }
         }
