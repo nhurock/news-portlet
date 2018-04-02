@@ -1,5 +1,5 @@
 <%@ page import="com.liferay.portal.kernel.util.GetterUtil" %>
-<%@ page import="ru.news.NewsPortletConstant" %>
+<%@ page import="ru.news.constant.NewsPortletConstant" %>
 <%@ page import="ru.news.search.JournalArticleDTODisplayTerms" %>
 <%@ page import="ru.news.search.JournalArticleDTOSearchContainer" %>
 <%@ page import="ru.news.service.JournalArticleDTOLocalServiceUtil" %>
@@ -13,9 +13,6 @@
 <%@ page pageEncoding="UTF-8" %>
 
 <%@include file="init.jsp" %>
-
-<portlet:defineObjects/>
-<theme:defineObjects/>
 
 <%
     String showArchiveNews = portletPreferences.getValue(NewsPortletConstant.ENABLE_ARCHIVE_NEWS, "");

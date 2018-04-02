@@ -26,12 +26,11 @@ public class LocalisationLocalServiceUtil {
             throw new IllegalArgumentException("Can't localize null journalArticleDTO.");
         }
         JournalArticle journalArticle = null;
+
         try {
             journalArticle = JournalArticleLocalServiceUtil.getLatestArticle(journalArticleDTO.getGroupId(), journalArticleDTO.getArticleId());
         } catch (PortalException | SystemException e) {
-            log.info("Can't get JournalArticles last version by groupId " + journalArticleDTO.getGroupId() +
-                    " and articleId " + journalArticleDTO.getArticleId() + ".");
-            log.error(e);
+            log.error("Can't get JournalArticles last version. " + e);
         }
 
         if (journalArticle == null) {
@@ -50,8 +49,10 @@ public class LocalisationLocalServiceUtil {
     }
 
     public static void localize(List<JournalArticleDTO> journalArticleDTOS, Locale locale) {
+        log.info("Localisation.");
         if (journalArticleDTOS == null) {
-            throw new IllegalArgumentException("Can't localize null List<JournalArticleDTO>.");
+            log.warn("Can't localize null List<JournalArticleDTO>.");
+            return;
         }
         for (JournalArticleDTO journalArticleDTO : journalArticleDTOS) {
             localize(journalArticleDTO, locale);
