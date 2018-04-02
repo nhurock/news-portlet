@@ -1,4 +1,4 @@
-package ru.news;
+package ru.news.constant;
 
 public class NewsPortletConstant {
 

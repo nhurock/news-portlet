@@ -1,5 +1,5 @@
 <%@ page import="com.liferay.portal.kernel.util.GetterUtil" %>
-<%@ page import="ru.news.NewsPortletConstant" %>
+<%@ page import="ru.news.constant.NewsPortletConstant" %>
 <%@ taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %>
 <%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>

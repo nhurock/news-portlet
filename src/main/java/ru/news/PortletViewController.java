@@ -4,6 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
+import ru.news.constant.NewsPortletConstant;
 import ru.news.model.JournalArticleDTO;
 import ru.news.service.JournalArticleDTOLocalServiceUtil;
 import ru.news.service.LocalisationLocalServiceUtil;

@@ -4,7 +4,7 @@ import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
-import ru.news.NewsPortletConstant;
+import ru.news.constant.NewsPortletConstant;
 
 import javax.portlet.*;
 
