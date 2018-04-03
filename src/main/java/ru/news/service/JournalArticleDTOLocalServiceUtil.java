@@ -33,6 +33,9 @@ public class JournalArticleDTOLocalServiceUtil {
     private static final String PROPERTY_CONTENT = "content";
     private static final String PROPERTY_NAME = "name";
     private static final String PROPERTY_STATUS = "status";
+    private static final String PROPERTY_ARTICLE = "articleId";
+    private static final String PROPERTY_VERSION = "version";
+    private static final String PROPERTY_ID = "uuid";
     private static Log log = LogFactoryUtil.getLog(JournalArticleDTOLocalServiceUtil.class);
 
     /**
@@ -74,15 +77,15 @@ public class JournalArticleDTOLocalServiceUtil {
             throw new IllegalArgumentException("Can't work with null List<JournalArticle>.");
         }
 
-        HashMap<String, JournalArticleDTO> journalArticleHashMap = new HashMap<>();
+       /* HashMap<String, JournalArticleDTO> journalArticleHashMap = new HashMap<>();
         for (JournalArticle journalArticle : journalArticleList) {
             String articleId = journalArticle.getArticleId();
             if (!journalArticleHashMap.containsKey(articleId)) {
                 journalArticleHashMap.put(articleId, getLatestVersion(journalArticle.getGroupId(), journalArticle.getArticleId()));
             }
-        }
-        log.info("Get List<JournalArticleDTO> by DynamicQuery and there is " + journalArticleHashMap.size() + " elements.");
-        return new ArrayList<>(journalArticleHashMap.values());
+        }*/
+        log.info("Get List<JournalArticleDTO> by DynamicQuery and there is " + journalArticleList.size() + " elements.");
+        return JournalArticleMap.toDto(journalArticleList);
     }
 
     /**
@@ -148,25 +151,10 @@ public class JournalArticleDTOLocalServiceUtil {
         DynamicQuery dynamicQueryJournalArticle = DynamicQueryFactoryUtil.forClass(JournalArticle.class, "journalArticle", classLoader);
         Junction junctionJournalArticle;
         String displayTermsKeywords = displayTerms.getKeywords();
-        DynamicQuery subDynQueryJArticleLatestVersion = DynamicQueryFactoryUtil.forClass(JournalArticle.class, "journalArticle", classLoader);
-        subDynQueryJArticleLatestVersion.add(PropertyFactoryUtil.forName("articleId").eqProperty("articleId"))
-                .setProjection(ProjectionFactoryUtil.max("id"));
-        ArrayList<JournalArticle> journalArticles = null;
 
         if (Validator.isBlank(displayTermsKeywords) && (!displayTerms.isAdvancedSearch())) {
 //            Получения данных без фильтров поиска
             junctionJournalArticle = RestrictionsFactoryUtil.disjunction();
-            if (displayTerms.getEnableArchiveNews()) {
-                dynamicQueryJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_STATUS).eq(WorkflowConstants.STATUS_EXPIRED));
-            }
-            dynamicQueryJournalArticle.add(PropertyFactoryUtil.forName("id").eq(subDynQueryJArticleLatestVersion))
-                    .add(PropertyFactoryUtil.forName(PROPERTY_STATUS).eq(WorkflowConstants.STATUS_APPROVED));
-//            dynamicQueryJournalArticle.add(junctionJournalArticle);
-
-//            return DynamicQueryFactoryUtil.forClass(JournalArticle.class, "journalArticle", classLoader).add(PropertyFactoryUtil.forName("id").eq(subDynQueryJArticleLatestVersion));
-//            dynamicQueryJournalArticle.add(junctionJournalArticle);
-//            dynamicQueryJournalArticle.add(junctionJournalArticle).setProjection(ProjectionFactoryUtil.max("journalArticle.version"));
-//            log.info(" dynamicQueryJournalArticle list size " + dynamicQueryJournalArticle.list().size());
         } else {
 //            Расширенный поиск
             if (displayTerms.isAdvancedSearch()) {
@@ -210,18 +198,38 @@ public class JournalArticleDTOLocalServiceUtil {
                 junctionJournalArticle.add(disjunction);
             }
 
-//         Фильтрация контента по контенту
-            Junction filteredJunction = RestrictionsFactoryUtil.disjunction();
-            if (displayTerms.getEnableArchiveNews()) {
-                log.info("Enable archive news.");
-                filteredJunction.add(PropertyFactoryUtil.forName(PROPERTY_STATUS).eq(WorkflowConstants.STATUS_EXPIRED));
-            }
-            filteredJunction.add(PropertyFactoryUtil.forName(PROPERTY_STATUS).eq(WorkflowConstants.STATUS_APPROVED));
-            junctionJournalArticle.add(filteredJunction);
-            dynamicQueryJournalArticle.add(junctionJournalArticle);
-//            dynamicQueryJournalArticle.add(junctionJournalArticle).setProjection(ProjectionFactoryUtil.max("journalArticle.version"));
         }
-//        dynamicQueryJournalArticle.add(RestrictionsFactoryUtil.)
+//         Фильтрация контента по контенту
+        Junction filteredJunction = RestrictionsFactoryUtil.disjunction();
+        if (displayTerms.getEnableArchiveNews()) {
+            log.info("Enable archive news.");
+            filteredJunction.add(PropertyFactoryUtil.forName(PROPERTY_STATUS).eq(WorkflowConstants.STATUS_EXPIRED));
+        }
+
+        filteredJunction.add(PropertyFactoryUtil.forName(PROPERTY_STATUS).eq(WorkflowConstants.STATUS_APPROVED));
+        junctionJournalArticle.add(filteredJunction);
+        dynamicQueryJournalArticle.add(junctionJournalArticle);
+
+        ProjectionList projectionListIdAndVersion = ProjectionFactoryUtil.projectionList();
+        projectionListIdAndVersion.add(ProjectionFactoryUtil.max(PROPERTY_ID));
+        projectionListIdAndVersion.add(ProjectionFactoryUtil.groupProperty(PROPERTY_ARTICLE));
+        projectionListIdAndVersion.add(ProjectionFactoryUtil.max(PROPERTY_VERSION));
+
+        DynamicQuery dynamicQueryIdOfLastVersion = DynamicQueryFactoryUtil.forClass(JournalArticle.class, classLoader).setProjection(projectionListIdAndVersion).add(junctionJournalArticle);
+        List<String> uuid = new ArrayList<>();
+        try {
+            List objects = JournalArticleLocalServiceUtil.dynamicQuery(dynamicQueryIdOfLastVersion);
+            if (objects != null) {
+                for (Object[] o : (List<Object[]>) objects) {
+//                    log.info(PROPERTY_ID + " " + o[0] + " " + PROPERTY_ARTICLE + " " + o[1] + " " + PROPERTY_VERSION + " " + o[2]);
+                    uuid.add((String) o[0]);
+                }
+            }
+        } catch (SystemException e) {
+            e.printStackTrace();
+        }
+
+        dynamicQueryJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_ID).in(uuid));
         return dynamicQueryJournalArticle;
     }
 
