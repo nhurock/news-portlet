@@ -1,8 +1,8 @@
 <%@ taglib prefix="liferay-ui" uri="http://liferay.com/tld/ui" %>
 <%@ taglib prefix="aui" uri="http://alloy.liferay.com/tld/aui" %>
-<%@ page import="ru.news.constant.NewsPortletConstant" %>
 <%@ page import="ru.news.search.JournalArticleDTODisplayTerms" %>
 <%@ page import="ru.news.search.JournalArticleDTOSearchContainer" %>
+<%@ page import="ru.news.constant.DisplayTermsParam" %>
 
 <%@include file="init.jsp" %>
 
@@ -13,10 +13,10 @@
 
 <liferay-ui:search-toggle buttonLabel="search-toggle.label.search-button.title" displayTerms="<%=displayTerms %>"
                           id="toggle_id_news_search">
-    <aui:input label="search-toggle.label.title" name="<%=NewsPortletConstant.DISPLAY_TERMS_PARAM_TITLE %>"
+    <aui:input label="search-toggle.label.title" name="<%=DisplayTermsParam.TITLE.getParam() %>"
                value="<%=displayTerms.getTitle() %>"/>
-    <aui:input label="search-toggle.label.tag" name="<%=NewsPortletConstant.DISPLAY_TERMS_PARAM_TAG %>"
+    <aui:input label="search-toggle.label.tag" name="<%=DisplayTermsParam.TAG.getParam() %>"
                value="<%=displayTerms.getTag() %>"/>
-    <aui:input label="search-toggle.label.category" name="<%=NewsPortletConstant.DISPLAY_TERMS_PARAM_CATEGORY %>"
+    <aui:input label="search-toggle.label.category" name="<%=DisplayTermsParam.CATEGORY.getParam() %>"
                value="<%=displayTerms.getCategory() %>"/>
 </liferay-ui:search-toggle>
