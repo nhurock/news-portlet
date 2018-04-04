@@ -27,30 +27,33 @@
     displayTerms.setLocale(user.getLocale());
 %>
 
-<aui:form method="POST" action="<%= portletURLString %>">
-    <liferay-ui:search-container searchContainer="<%= articleDTOSearchContainer%>"
+<aui:form method="POST" action="<%=portletURLString %>">
+    <liferay-ui:search-container searchContainer="<%=articleDTOSearchContainer %>"
                                  emptyResultsMessage="search-container.empty-result-message">
-        <liferay-ui:search-form page="<%= NewsPortletConstant.PAGE_SEARCH%>"
-                                servletContext="<%= application %>"/>
+        <liferay-ui:search-form page="<%=NewsPortletConstant.PAGE_SEARCH %>"
+                                servletContext="<%=application %>"/>
         <liferay-ui:search-container-results
-                results="<%= JournalArticleDTOLocalServiceUtil.getJournalArticles(displayTerms, articleDTOSearchContainer.getStart(), articleDTOSearchContainer.getEnd()) %>"
-                total="<%= JournalArticleDTOLocalServiceUtil.getTotalJournalArticleCount(displayTerms) %>"
+                results="<%=JournalArticleDTOLocalServiceUtil.getJournalArticles(displayTerms, articleDTOSearchContainer.getStart(), articleDTOSearchContainer.getEnd()) %>"
+                total="<%=JournalArticleDTOLocalServiceUtil.getTotalJournalArticleCount(displayTerms) %>"
         />
 
         <liferay-ui:search-container-row className="ru.news.model.JournalArticleDTO" modelVar="news">
 
             <portlet:renderURL var="getViewNewsURL" windowState="normal">
-                <portlet:param name="action" value="<%= NewsPortletConstant.RENDER_SINGLE_NEWS%>"/>
-                <portlet:param name="groupId" value="${news.groupId}"/>
-                <portlet:param name="articleId" value="${news.articleId}"/>
+                <portlet:param name="action"
+                               value="<%=NewsPortletConstant.METHOD_GET_ACTION_PARAM_VALUE_RENDER_SINGLE_NEWS_PAGE %>"/>
+                <portlet:param name="<%=NewsPortletConstant.RENDER_REQUEST_PARAM_GROUP_ID %>" value="${news.groupId}"/>
+                <portlet:param name="<%=NewsPortletConstant.RENDER_REQUEST_PARAM_ARTICLE_ID %>"
+                               value="${news.articleId}"/>
             </portlet:renderURL>
 
             <liferay-ui:search-container-column-text href="${getViewNewsURL}"
-                                                     name="search-container-column-text.label.title" property="title"/>
+                                                     name="search-container-column-text.label.title"
+                                                     property="<%=NewsPortletConstant.SEARCH_CONTAINER_COLUMN_PROPERTY_TITLE %>"/>
             <liferay-ui:search-container-column-text name="search-container-column-text.label.content"
-                                                     property="content"/>
+                                                     property="<%=NewsPortletConstant.SEARCH_CONTAINER_COLUMN_PROPERTY_CONTENT %>"/>
             <liferay-ui:search-container-column-text name="search-container-column-text.label.date"
-                                                     property="publishDate"/>
+                                                     property="<%=NewsPortletConstant.SEARCH_CONTAINER_COLUMN_PROPERTY_PUBLISH_DATE %>"/>
 
         </liferay-ui:search-container-row>
         <liferay-ui:search-iterator/>

@@ -14,18 +14,19 @@
     Boolean showArchiveNewsFlag = GetterUtil.getBoolean(showArchiveNews);
 %>
 
-<liferay-ui:success key="config-stored" message="portlet.configuration.label.configuration-saved-success"/>
+<liferay-ui:success key="<%=NewsPortletConstant.ACTION_REQUEST_KEY_CONFIG_STORED %>"
+                    message="portlet.configuration.label.configuration-saved-success"/>
 
-<aui:form method="post" action="<%=configurationURL%>">
+<aui:form method="post" action="<%=configurationURL %>">
     <label>
         <liferay-ui:message key="portlet.configuration.label.view-archive-news"/>:
         <c:choose>
-            <c:when test="<%= showArchiveNewsFlag%>">
-                <input class="<%=enableArchiveNews%>" type="checkbox" checked=""
+            <c:when test="<%=showArchiveNewsFlag %>">
+                <input class="<%=enableArchiveNews %>" type="checkbox" checked=""
                        name='<portlet:namespace/>enableArchiveNews'>
             </c:when>
             <c:otherwise>
-                <input class="<%=enableArchiveNews%>" type="checkbox"
+                <input class="<%=enableArchiveNews %>" type="checkbox"
                        name='<portlet:namespace/>enableArchiveNews'>
             </c:otherwise>
         </c:choose>

@@ -21,7 +21,7 @@ public class NewsPortletConfigurationActionImpl implements ConfigurationAction {
         prefs.setValue(NewsPortletConstant.ENABLE_ARCHIVE_NEWS, enableArchiveNews);
         prefs.store();
 
-        SessionMessages.add(actionRequest, "config-stored");
+        SessionMessages.add(actionRequest, NewsPortletConstant.ACTION_REQUEST_KEY_CONFIG_STORED);
         SessionMessages.add(actionRequest, portletConfig.getPortletName() + SessionMessages.KEY_SUFFIX_REFRESH_PORTLET, portletResource);
     }
 

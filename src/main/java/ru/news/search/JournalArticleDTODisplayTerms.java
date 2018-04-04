@@ -4,6 +4,7 @@ import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.util.ParamUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import ru.news.constant.NewsPortletConstant;
 
 import javax.portlet.PortletRequest;
 import java.util.Locale;
@@ -20,9 +21,8 @@ public class JournalArticleDTODisplayTerms extends DisplayTerms {
 
     JournalArticleDTODisplayTerms(PortletRequest portletRequest) {
         super(portletRequest);
-        title = ParamUtil.getString(portletRequest, "title");
-        tag = ParamUtil.getString(portletRequest, "tag");
-        category = ParamUtil.getString(portletRequest, "category");
-        enableArchiveNews = ParamUtil.getBoolean(portletRequest, "showArchiveNewsFlag");
+        title = ParamUtil.getString(portletRequest, NewsPortletConstant.DISPLAY_TERMS_PARAM_TITLE);
+        tag = ParamUtil.getString(portletRequest, NewsPortletConstant.DISPLAY_TERMS_PARAM_TAG);
+        category = ParamUtil.getString(portletRequest, NewsPortletConstant.DISPLAY_TERMS_PARAM_CATEGORY);
     }
 }

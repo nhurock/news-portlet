@@ -18,18 +18,18 @@ public class PortletViewController {
 
     private static final String PAGE_VIEW = "newsblock-mvcportlet/view";
     private static final String PAGE_NEWS = "newsblock-mvcportlet/news";
-    private static final String ACTION_RENDER_SINGLE_NEWS = "action=" + NewsPortletConstant.RENDER_SINGLE_NEWS;
+    private static final String RENDER_MAPPING_ACTION_PARAM_RENDER_SINGLE_NEWS_PAGE = "action=" + NewsPortletConstant.METHOD_GET_ACTION_PARAM_VALUE_RENDER_SINGLE_NEWS_PAGE;
 
     @RenderMapping
     public String renderMainView(Model model) {
         return PAGE_VIEW;
     }
 
-    @RenderMapping(params = ACTION_RENDER_SINGLE_NEWS)
+    @RenderMapping(params = RENDER_MAPPING_ACTION_PARAM_RENDER_SINGLE_NEWS_PAGE)
     public String renderSingleNewsView(RenderRequest request, RenderResponse response, Model model) {
 
-        long groupId = Long.parseLong(request.getParameter("groupId"));
-        String article = request.getParameter("articleId");
+        long groupId = Long.parseLong(request.getParameter(NewsPortletConstant.RENDER_REQUEST_PARAM_GROUP_ID));
+        String article = request.getParameter(NewsPortletConstant.RENDER_REQUEST_PARAM_ARTICLE_ID);
         JournalArticleDTO journalArticleDTO = JournalArticleDTOLocalServiceUtil.getLatestVersion(groupId, article);
 
         LocalisationLocalServiceUtil.localize(journalArticleDTO, request.getLocale());
