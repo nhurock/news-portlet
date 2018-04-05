@@ -211,25 +211,34 @@ public class JournalArticleDTOLocalServiceUtil {
         dynamicQueryJournalArticle.add(junctionJournalArticle);
 
         ProjectionList projectionListIdAndVersion = ProjectionFactoryUtil.projectionList();
+        projectionListIdAndVersion.add(ProjectionFactoryUtil.property(PROPERTY_ARTICLE));
         projectionListIdAndVersion.add(ProjectionFactoryUtil.max(PROPERTY_ID));
-        projectionListIdAndVersion.add(ProjectionFactoryUtil.groupProperty(PROPERTY_ARTICLE));
         projectionListIdAndVersion.add(ProjectionFactoryUtil.max(PROPERTY_VERSION));
 
-        DynamicQuery dynamicQueryIdOfLastVersion = DynamicQueryFactoryUtil.forClass(JournalArticle.class, classLoader).setProjection(projectionListIdAndVersion).add(junctionJournalArticle);
-        List<String> uuid = new ArrayList<>();
+        DynamicQuery dynamicQueryIdOfLastVersion = DynamicQueryFactoryUtil.forClass(JournalArticle.class, classLoader)
+                .setProjection(ProjectionFactoryUtil.groupProperty(PROPERTY_ARTICLE))
+                .setProjection(projectionListIdAndVersion)
+                .setProjection(ProjectionFactoryUtil.distinct(ProjectionFactoryUtil.property(PROPERTY_ID)));
+
+    /*    DynamicQuery query = DynamicQueryFactoryUtil.forClass(JournalArticle.class, classLoader)
+                .add(PropertyFactoryUtil.forName(PROPERTY_ID).in(dynamicQueryIdOfLastVersion))
+                .setProjection(ProjectionFactoryUtil.groupProperty(PROPERTY_ID));*/
+
+        List<Long> uuid = new ArrayList<>();
         try {
             List objects = JournalArticleLocalServiceUtil.dynamicQuery(dynamicQueryIdOfLastVersion);
+//            System.out.println("query last version size" + JournalArticleLocalServiceUtil.dynamicQueryCount(dynamicQueryIdOfLastVersion));
             if (objects != null) {
-                for (Object[] o : (List<Object[]>) objects) {
-//                    log.info(PROPERTY_ID + " " + o[0] + " " + PROPERTY_ARTICLE + " " + o[1] + " " + PROPERTY_VERSION + " " + o[2]);
-                    uuid.add((String) o[0]);
+                for (Object o : (List) objects) {
+                    log.info(PROPERTY_ID + " " + o.toString());
+                    uuid.add(Long.getLong(o.toString()));
                 }
             }
         } catch (SystemException e) {
             e.printStackTrace();
         }
 
-        dynamicQueryJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_ID).in(uuid));
+        dynamicQueryJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_ID).in(dynamicQueryIdOfLastVersion));
         return dynamicQueryJournalArticle;
     }
 
