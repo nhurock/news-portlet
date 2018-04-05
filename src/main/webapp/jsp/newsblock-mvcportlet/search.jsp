@@ -13,10 +13,10 @@
 
 <liferay-ui:search-toggle buttonLabel="search-toggle.label.search-button.title" displayTerms="<%=displayTerms %>"
                           id="toggle_id_news_search">
-    <aui:input label="search-toggle.label.title" name="<%=DisplayTermsParam.TITLE.getParam() %>"
+    <aui:input label="search-toggle.label.title" name="<%=DisplayTermsParam.TITLE.getName() %>"
                value="<%=displayTerms.getTitle() %>"/>
-    <aui:input label="search-toggle.label.tag" name="<%=DisplayTermsParam.TAG.getParam() %>"
+    <aui:input label="search-toggle.label.tag" name="<%=DisplayTermsParam.TAG.getName() %>"
                value="<%=displayTerms.getTag() %>"/>
-    <aui:input label="search-toggle.label.category" name="<%=DisplayTermsParam.CATEGORY.getParam() %>"
+    <aui:input label="search-toggle.label.category" name="<%=DisplayTermsParam.CATEGORY.getName() %>"
                value="<%=displayTerms.getCategory() %>"/>
 </liferay-ui:search-toggle>

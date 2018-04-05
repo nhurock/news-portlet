@@ -5,14 +5,14 @@ public enum DisplayTermsParam {
     TAG("tag"),
     CATEGORY("category");
 
-    private String param;
+    private String name;
 
-    DisplayTermsParam(String param) {
-        this.param = param;
+    DisplayTermsParam(String name) {
+        this.name = name;
     }
 
-    public String getParam() {
-        return param;
+    public String getName() {
+        return name;
     }
 }
 

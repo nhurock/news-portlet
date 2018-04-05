@@ -21,8 +21,8 @@ public class JournalArticleDTODisplayTerms extends DisplayTerms {
 
     JournalArticleDTODisplayTerms(PortletRequest portletRequest) {
         super(portletRequest);
-        title = ParamUtil.getString(portletRequest, DisplayTermsParam.TITLE.getParam());
-        tag = ParamUtil.getString(portletRequest, DisplayTermsParam.TAG.getParam());
-        category = ParamUtil.getString(portletRequest, DisplayTermsParam.CATEGORY.getParam());
+        title = ParamUtil.getString(portletRequest, DisplayTermsParam.TITLE.getName());
+        tag = ParamUtil.getString(portletRequest, DisplayTermsParam.TAG.getName());
+        category = ParamUtil.getString(portletRequest, DisplayTermsParam.CATEGORY.getName());
     }
 }
