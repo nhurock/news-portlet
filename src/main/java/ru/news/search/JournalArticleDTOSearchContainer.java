@@ -14,6 +14,13 @@ public class JournalArticleDTOSearchContainer extends SearchContainer<JournalArt
     private static final String EMPTY_RESULT_MESSAGE = null;
 
     public JournalArticleDTOSearchContainer(PortletRequest portletRequest, PortletURL iteratorURL) {
-        super(portletRequest, new JournalArticleDTODisplayTerms(portletRequest), new JournalArticleDTODisplayTerms(portletRequest), DEFAULT_CUR_PARAM, DELTA, iteratorURL, HEADER_NAMES, EMPTY_RESULT_MESSAGE);
+        super(portletRequest,
+                new JournalArticleDTODisplayTerms(portletRequest),
+                new JournalArticleDTODisplayTerms(portletRequest),
+                DEFAULT_CUR_PARAM,
+                DELTA,
+                iteratorURL,
+                HEADER_NAMES,
+                EMPTY_RESULT_MESSAGE);
     }
 }
