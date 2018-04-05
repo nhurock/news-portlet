@@ -42,7 +42,7 @@ public class JournalArticleDTOLocalServiceUtil {
      * @param groupId   groupId {@link JournalArticle}
      */
     public static JournalArticleDTO getLatestVersion(long groupId, String articleId) {
-        if ((groupId == 0) || (articleId == null)) {
+        if (groupId == 0 || articleId == null) {
             throw new IllegalArgumentException("Can't get latest version journal article by groupId " + groupId + " and articleId " + articleId);
         }
         JournalArticle journalArticle = null;
@@ -148,27 +148,26 @@ public class JournalArticleDTOLocalServiceUtil {
                     junctionJournalArticle = RestrictionsFactoryUtil.disjunction();
                 }
 
-                if (!Validator.isBlank(displayTerms.getTitle())) {
-                    log.info("Search by title " + displayTerms.getTitle());
-                    junctionJournalArticle.add(RestrictionsFactoryUtil.ilike(PROPERTY_TITLE, "%" + displayTermsKeywords + "%"));
+                String title = displayTerms.getTitle();
+                if (!Validator.isBlank(title)) {
+                    log.info("Search by title " + title);
+                    junctionJournalArticle.add(RestrictionsFactoryUtil.ilike(PROPERTY_TITLE, "%" + title + "%"));
                 }
                 String tagName = displayTerms.getTag();
                 if (!Validator.isBlank(tagName)) {
-                    log.info("Search by tag " + displayTerms.getTag());
                     Junction disjunction = RestrictionsFactoryUtil.disjunction();
-                    for (Long resourcePrimaryKey : getJournalArticlesResourcePrimKeysByTag(tagName)) {
-                        disjunction.add(PropertyFactoryUtil.forName(PROPERTY_RESOURCE_PRIM_KEY).eq(resourcePrimaryKey));
+                    List<Long> primKeysByTag = getJournalArticlesResourcePrimKeysByTag(tagName);
+                    if (primKeysByTag != null) {
+                        junctionJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_RESOURCE_PRIM_KEY).in(primKeysByTag));
                     }
-                    junctionJournalArticle.add(disjunction);
                 }
                 String categoryName = displayTerms.getCategory();
                 if (!Validator.isBlank(categoryName)) {
                     log.info("Search by category " + displayTerms.getCategory());
-                    Junction disjunction = RestrictionsFactoryUtil.disjunction();
-                    for (Long resourcePrimKey : getJournalArticlesResourcePrimKeysByCategories(categoryName)) {
-                        disjunction.add(PropertyFactoryUtil.forName(PROPERTY_RESOURCE_PRIM_KEY).eq(resourcePrimKey));
+                    List<Long> primKeysByCategories = getJournalArticlesResourcePrimKeysByCategories(categoryName);
+                    if (primKeysByCategories != null) {
+                        junctionJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_RESOURCE_PRIM_KEY).in(primKeysByCategories));
                     }
-                    junctionJournalArticle.add(disjunction);
                 }
 
             } else {
@@ -181,7 +180,7 @@ public class JournalArticleDTOLocalServiceUtil {
                 junctionJournalArticle.add(disjunction);
             }
 
-//         Фильтрация контента по контенту
+//         Фильтр показа архифных новостей
             Junction filteredJunction = RestrictionsFactoryUtil.disjunction();
             if (displayTerms.getEnableArchiveNews()) {
                 log.info("Enable archive news.");
