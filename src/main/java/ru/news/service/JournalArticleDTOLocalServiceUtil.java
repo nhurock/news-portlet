@@ -180,7 +180,7 @@ public class JournalArticleDTOLocalServiceUtil {
                 junctionJournalArticle.add(disjunction);
             }
 
-//         Фильтр показа архифных новостей
+//         Фильтр отображения архивных новостей
             Junction filteredJunction = RestrictionsFactoryUtil.disjunction();
             if (displayTerms.getEnableArchiveNews()) {
                 log.info("Enable archive news.");
