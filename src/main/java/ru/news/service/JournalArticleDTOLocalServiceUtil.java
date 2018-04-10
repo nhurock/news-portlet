@@ -22,7 +22,6 @@ import ru.news.model.JournalArticleDTO;
 import ru.news.search.JournalArticleDTODisplayTerms;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -35,7 +34,7 @@ public class JournalArticleDTOLocalServiceUtil {
     private static final String PROPERTY_STATUS = "status";
     private static final String PROPERTY_ARTICLE = "articleId";
     private static final String PROPERTY_VERSION = "version";
-    private static final String PROPERTY_ID = "uuid";
+    private static final String PROPERTY_UUID = "uuid";
     private static Log log = LogFactoryUtil.getLog(JournalArticleDTOLocalServiceUtil.class);
 
     /**
@@ -210,35 +209,15 @@ public class JournalArticleDTOLocalServiceUtil {
         junctionJournalArticle.add(filteredJunction);
         dynamicQueryJournalArticle.add(junctionJournalArticle);
 
-        ProjectionList projectionListIdAndVersion = ProjectionFactoryUtil.projectionList();
-        projectionListIdAndVersion.add(ProjectionFactoryUtil.property(PROPERTY_ARTICLE));
-        projectionListIdAndVersion.add(ProjectionFactoryUtil.max(PROPERTY_ID));
-        projectionListIdAndVersion.add(ProjectionFactoryUtil.max(PROPERTY_VERSION));
+        // Получение актуальной версии JournalArticle
+        DynamicQuery subSelect = DynamicQueryFactoryUtil.forClass(JournalArticle.class, "child", classLoader)
+                .add(PropertyFactoryUtil.forName(PROPERTY_ARTICLE).eqProperty("parent.articleId")).setProjection(ProjectionFactoryUtil.max(PROPERTY_VERSION));
 
-        DynamicQuery dynamicQueryIdOfLastVersion = DynamicQueryFactoryUtil.forClass(JournalArticle.class, classLoader)
-                .setProjection(ProjectionFactoryUtil.groupProperty(PROPERTY_ARTICLE))
-                .setProjection(projectionListIdAndVersion)
-                .setProjection(ProjectionFactoryUtil.distinct(ProjectionFactoryUtil.property(PROPERTY_ID)));
+        DynamicQuery dynamicQueryUuidOfLastVersionJournalArticle = DynamicQueryFactoryUtil.forClass(JournalArticle.class, "parent", classLoader)
+                .add(PropertyFactoryUtil.forName(PROPERTY_VERSION).in(subSelect))
+                .setProjection(ProjectionFactoryUtil.property(PROPERTY_UUID));
 
-    /*    DynamicQuery query = DynamicQueryFactoryUtil.forClass(JournalArticle.class, classLoader)
-                .add(PropertyFactoryUtil.forName(PROPERTY_ID).in(dynamicQueryIdOfLastVersion))
-                .setProjection(ProjectionFactoryUtil.groupProperty(PROPERTY_ID));*/
-
-        List<Long> uuid = new ArrayList<>();
-        try {
-            List objects = JournalArticleLocalServiceUtil.dynamicQuery(dynamicQueryIdOfLastVersion);
-//            System.out.println("query last version size" + JournalArticleLocalServiceUtil.dynamicQueryCount(dynamicQueryIdOfLastVersion));
-            if (objects != null) {
-                for (Object o : (List) objects) {
-                    log.info(PROPERTY_ID + " " + o.toString());
-                    uuid.add(Long.getLong(o.toString()));
-                }
-            }
-        } catch (SystemException e) {
-            e.printStackTrace();
-        }
-
-        dynamicQueryJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_ID).in(dynamicQueryIdOfLastVersion));
+        dynamicQueryJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_UUID).in(dynamicQueryUuidOfLastVersionJournalArticle));
         return dynamicQueryJournalArticle;
     }
 
@@ -319,3 +298,4 @@ public class JournalArticleDTOLocalServiceUtil {
         return resourcePrimKeyList;
     }
 }
+
