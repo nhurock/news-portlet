@@ -25,4 +25,44 @@ public class JournalArticleDTODisplayTerms extends DisplayTerms {
         tag = ParamUtil.getString(portletRequest, DisplayTermsParam.TAG.getName());
         category = ParamUtil.getString(portletRequest, DisplayTermsParam.CATEGORY.getName());
     }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public Boolean getEnableArchiveNews() {
+        return enableArchiveNews;
+    }
+
+    public void setEnableArchiveNews(Boolean enableArchiveNews) {
+        this.enableArchiveNews = enableArchiveNews;
+    }
+
+    public Locale getLocale() {
+        return locale;
+    }
+
+    public void setLocale(Locale locale) {
+        this.locale = locale;
+    }
 }

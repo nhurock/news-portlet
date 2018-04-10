@@ -22,7 +22,6 @@ import ru.news.model.JournalArticleDTO;
 import ru.news.search.JournalArticleDTODisplayTerms;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -33,6 +32,9 @@ public class JournalArticleDTOLocalServiceUtil {
     private static final String PROPERTY_CONTENT = "content";
     private static final String PROPERTY_NAME = "name";
     private static final String PROPERTY_STATUS = "status";
+    private static final String PROPERTY_ARTICLE = "articleId";
+    private static final String PROPERTY_VERSION = "version";
+    private static final String PROPERTY_UUID = "uuid";
     private static Log log = LogFactoryUtil.getLog(JournalArticleDTOLocalServiceUtil.class);
 
     /**
@@ -42,7 +44,7 @@ public class JournalArticleDTOLocalServiceUtil {
      * @param groupId   groupId {@link JournalArticle}
      */
     public static JournalArticleDTO getLatestVersion(long groupId, String articleId) {
-        if (groupId == 0 || articleId == null) {
+        if ((groupId == 0) || (articleId == null)) {
             throw new IllegalArgumentException("Can't get latest version journal article by groupId " + groupId + " and articleId " + articleId);
         }
         JournalArticle journalArticle = null;
@@ -74,14 +76,15 @@ public class JournalArticleDTOLocalServiceUtil {
             throw new IllegalArgumentException("Can't work with null List<JournalArticle>.");
         }
 
-        HashMap<String, JournalArticleDTO> journalArticleHashMap = new HashMap<>();
+       /* HashMap<String, JournalArticleDTO> journalArticleHashMap = new HashMap<>();
         for (JournalArticle journalArticle : journalArticleList) {
             String articleId = journalArticle.getArticleId();
             if (!journalArticleHashMap.containsKey(articleId)) {
                 journalArticleHashMap.put(articleId, getLatestVersion(journalArticle.getGroupId(), journalArticle.getArticleId()));
             }
-        }
-        return new ArrayList<>(journalArticleHashMap.values());
+        }*/
+        log.info("Get List<JournalArticleDTO> by DynamicQuery and there is " + journalArticleList.size() + " elements.");
+        return JournalArticleMap.toDto(journalArticleList);
     }
 
     /**
@@ -95,7 +98,9 @@ public class JournalArticleDTOLocalServiceUtil {
         if (displayTerms == null) {
             throw new IllegalArgumentException("Can't get JournalArticle with null JournalArticleDTODisplayTerms.");
         }
-        List<JournalArticleDTO> articleDTOS = getJournalArticleData(displayTerms);
+        Locale locale = displayTerms.getLocale();
+        DynamicQuery dynamicQuery = getJournalArticleDynamicQuery(displayTerms);
+        List<JournalArticleDTO> articleDTOS = getJournalArticleData(dynamicQuery, locale);
         if (articleDTOS == null) {
             throw new IllegalArgumentException("Haven't JournalArticle's data from search.");
         }
@@ -109,35 +114,46 @@ public class JournalArticleDTOLocalServiceUtil {
         if (displayTerms == null) {
             throw new IllegalArgumentException("Can't get data's count with null JournalArticleDTODisplayTerms.");
         }
-        List<JournalArticleDTO> journalArticleData = getJournalArticleData(displayTerms);
-        if (journalArticleData == null) return 0;
-        return journalArticleData.size();
+        DynamicQuery dynamicQuery = getJournalArticleDynamicQuery(displayTerms);
+        if (dynamicQuery != null) {
+            try {
+                return (int) JournalArticleLocalServiceUtil.dynamicQueryCount(dynamicQuery);
+            } catch (SystemException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
     }
 
     /**
-     * Возращает список новстей в соответсвии с формой запроса
+     * Возвращает список новостей из запроса.
+     *
+     * @param dynamicQuery запрос
+     * @param locale       язык пользователя
+     */
+    private static List<JournalArticleDTO> getJournalArticleData(DynamicQuery dynamicQuery, Locale locale) {
+        List<JournalArticleDTO> journalArticles = getDynamicQuery(dynamicQuery);
+        LocalisationLocalServiceUtil.localize(journalArticles, locale);
+        return journalArticles;
+    }
+
+    /**
+     * Возращает DynamicQuery из запроса формы поиска
      *
      * @param displayTerms параметры поиска
      */
-    private static List<JournalArticleDTO> getJournalArticleData(JournalArticleDTODisplayTerms displayTerms) {
+    private static DynamicQuery getJournalArticleDynamicQuery(JournalArticleDTODisplayTerms displayTerms) {
         if (displayTerms == null) {
             throw new IllegalArgumentException("Can't get List<JournalArticle> with null JournalArticleDTODisplayTerms.");
         }
-        List<JournalArticleDTO> journalArticles;
-        Locale locale = displayTerms.getLocale();
         ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
         DynamicQuery dynamicQueryJournalArticle = DynamicQueryFactoryUtil.forClass(JournalArticle.class, "journalArticle", classLoader);
         Junction junctionJournalArticle;
         String displayTermsKeywords = displayTerms.getKeywords();
+
         if (Validator.isBlank(displayTermsKeywords) && (!displayTerms.isAdvancedSearch())) {
 //            Получения данных без фильтров поиска
             junctionJournalArticle = RestrictionsFactoryUtil.disjunction();
-            if (displayTerms.getEnableArchiveNews()) {
-                junctionJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_STATUS).eq(WorkflowConstants.STATUS_EXPIRED));
-            }
-            junctionJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_STATUS).eq(WorkflowConstants.STATUS_APPROVED));
-            dynamicQueryJournalArticle.add(junctionJournalArticle);
-            journalArticles = JournalArticleDTOLocalServiceUtil.getDynamicQuery(dynamicQueryJournalArticle);
         } else {
 //            Расширенный поиск
             if (displayTerms.isAdvancedSearch()) {
@@ -148,26 +164,27 @@ public class JournalArticleDTOLocalServiceUtil {
                     junctionJournalArticle = RestrictionsFactoryUtil.disjunction();
                 }
 
-                String title = displayTerms.getTitle();
-                if (!Validator.isBlank(title)) {
-                    log.info("Search by title " + title);
-                    junctionJournalArticle.add(RestrictionsFactoryUtil.ilike(PROPERTY_TITLE, "%" + title + "%"));
+                if (!Validator.isBlank(displayTerms.getTitle())) {
+                    log.info("Search by title " + displayTerms.getTitle());
+                    junctionJournalArticle.add(RestrictionsFactoryUtil.ilike(PROPERTY_TITLE, "%" + displayTermsKeywords + "%"));
                 }
                 String tagName = displayTerms.getTag();
                 if (!Validator.isBlank(tagName)) {
+                    log.info("Search by tag " + displayTerms.getTag());
                     Junction disjunction = RestrictionsFactoryUtil.disjunction();
-                    List<Long> primKeysByTag = getJournalArticlesResourcePrimKeysByTag(tagName);
-                    if (primKeysByTag != null) {
-                        junctionJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_RESOURCE_PRIM_KEY).in(primKeysByTag));
+                    for (Long resourcePrimaryKey : getJournalArticlesResourcePrimKeysByTag(tagName)) {
+                        disjunction.add(PropertyFactoryUtil.forName(PROPERTY_RESOURCE_PRIM_KEY).eq(resourcePrimaryKey));
                     }
+                    junctionJournalArticle.add(disjunction);
                 }
                 String categoryName = displayTerms.getCategory();
                 if (!Validator.isBlank(categoryName)) {
                     log.info("Search by category " + displayTerms.getCategory());
-                    List<Long> primKeysByCategories = getJournalArticlesResourcePrimKeysByCategories(categoryName);
-                    if (primKeysByCategories != null) {
-                        junctionJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_RESOURCE_PRIM_KEY).in(primKeysByCategories));
+                    Junction disjunction = RestrictionsFactoryUtil.disjunction();
+                    for (Long resourcePrimKey : getJournalArticlesResourcePrimKeysByCategories(categoryName)) {
+                        disjunction.add(PropertyFactoryUtil.forName(PROPERTY_RESOURCE_PRIM_KEY).eq(resourcePrimKey));
                     }
+                    junctionJournalArticle.add(disjunction);
                 }
 
             } else {
@@ -180,21 +197,28 @@ public class JournalArticleDTOLocalServiceUtil {
                 junctionJournalArticle.add(disjunction);
             }
 
-//         Фильтр отображения архивных новостей
-            Junction filteredJunction = RestrictionsFactoryUtil.disjunction();
-            if (displayTerms.getEnableArchiveNews()) {
-                log.info("Enable archive news.");
-                filteredJunction.add(PropertyFactoryUtil.forName(PROPERTY_STATUS).eq(WorkflowConstants.STATUS_EXPIRED));
-            }
-            filteredJunction.add(PropertyFactoryUtil.forName(PROPERTY_STATUS).eq(WorkflowConstants.STATUS_APPROVED));
-            junctionJournalArticle.add(filteredJunction);
-            dynamicQueryJournalArticle.add(junctionJournalArticle);
-            journalArticles = JournalArticleDTOLocalServiceUtil.getDynamicQuery(dynamicQueryJournalArticle);
+        }
+//         Фильтрация контента по контенту
+        Junction filteredJunction = RestrictionsFactoryUtil.disjunction();
+        if (displayTerms.getEnableArchiveNews()) {
+            log.info("Enable archive news.");
+            filteredJunction.add(PropertyFactoryUtil.forName(PROPERTY_STATUS).eq(WorkflowConstants.STATUS_EXPIRED));
         }
 
-//         Локализация контента
-        LocalisationLocalServiceUtil.localize(journalArticles, locale);
-        return journalArticles;
+        filteredJunction.add(PropertyFactoryUtil.forName(PROPERTY_STATUS).eq(WorkflowConstants.STATUS_APPROVED));
+        junctionJournalArticle.add(filteredJunction);
+        dynamicQueryJournalArticle.add(junctionJournalArticle);
+
+        // Получение актуальной версии JournalArticle
+        DynamicQuery subSelect = DynamicQueryFactoryUtil.forClass(JournalArticle.class, "child", classLoader)
+                .add(PropertyFactoryUtil.forName(PROPERTY_ARTICLE).eqProperty("parent.articleId")).setProjection(ProjectionFactoryUtil.max(PROPERTY_VERSION));
+
+        DynamicQuery dynamicQueryUuidOfLastVersionJournalArticle = DynamicQueryFactoryUtil.forClass(JournalArticle.class, "parent", classLoader)
+                .add(PropertyFactoryUtil.forName(PROPERTY_VERSION).in(subSelect))
+                .setProjection(ProjectionFactoryUtil.property(PROPERTY_UUID));
+
+        dynamicQueryJournalArticle.add(PropertyFactoryUtil.forName(PROPERTY_UUID).in(dynamicQueryUuidOfLastVersionJournalArticle));
+        return dynamicQueryJournalArticle;
     }
 
     /**
@@ -274,3 +298,4 @@ public class JournalArticleDTOLocalServiceUtil {
         return resourcePrimKeyList;
     }
 }
+

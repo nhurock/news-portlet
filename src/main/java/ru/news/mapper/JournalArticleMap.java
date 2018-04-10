@@ -24,7 +24,6 @@ public class JournalArticleMap {
         if (journalArticle == null) {
             throw new IllegalArgumentException("Can't convert null JournalArticle.");
         }
-
         JournalArticleDTO journalArticleDTO = new JournalArticleDTO();
 
         journalArticleDTO.setGroupId(journalArticle.getGroupId());
