@@ -17,6 +17,7 @@ import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
+import ru.news.comparator.JournalArticleDTOComparator;
 import ru.news.mapper.JournalArticleMap;
 import ru.news.model.JournalArticleDTO;
 import ru.news.search.JournalArticleDTODisplayTerms;
@@ -134,6 +135,7 @@ public class JournalArticleDTOLocalServiceUtil {
     private static List<JournalArticleDTO> getJournalArticleData(DynamicQuery dynamicQuery, Locale locale) {
         List<JournalArticleDTO> journalArticles = getDynamicQuery(dynamicQuery);
         LocalisationLocalServiceUtil.localize(journalArticles, locale);
+        journalArticles.sort(new JournalArticleDTOComparator().reversed());
         return journalArticles;
     }
 
@@ -164,26 +166,25 @@ public class JournalArticleDTOLocalServiceUtil {
                     junctionJournalArticle = RestrictionsFactoryUtil.disjunction();
                 }
 
-                if (!Validator.isBlank(displayTerms.getTitle())) {
-                    log.info("Search by title " + displayTerms.getTitle());
-                    junctionJournalArticle.add(RestrictionsFactoryUtil.ilike(PROPERTY_TITLE, "%" + displayTermsKeywords + "%"));
+                String title = displayTerms.getTitle();
+                if (!Validator.isBlank(title)) {
+                    log.info("Search by title " + title);
+                    junctionJournalArticle.add(RestrictionsFactoryUtil.ilike(PROPERTY_TITLE, "%" + title + "%"));
                 }
                 String tagName = displayTerms.getTag();
                 if (!Validator.isBlank(tagName)) {
-                    log.info("Search by tag " + displayTerms.getTag());
+                    log.info("Search by tag " + tagName);
                     Junction disjunction = RestrictionsFactoryUtil.disjunction();
-                    for (Long resourcePrimaryKey : getJournalArticlesResourcePrimKeysByTag(tagName)) {
-                        disjunction.add(PropertyFactoryUtil.forName(PROPERTY_RESOURCE_PRIM_KEY).eq(resourcePrimaryKey));
-                    }
+                    disjunction.add(PropertyFactoryUtil.forName(PROPERTY_RESOURCE_PRIM_KEY).in(getJournalArticlesResourcePrimKeysByTag(tagName)));
+
                     junctionJournalArticle.add(disjunction);
                 }
                 String categoryName = displayTerms.getCategory();
                 if (!Validator.isBlank(categoryName)) {
                     log.info("Search by category " + displayTerms.getCategory());
                     Junction disjunction = RestrictionsFactoryUtil.disjunction();
-                    for (Long resourcePrimKey : getJournalArticlesResourcePrimKeysByCategories(categoryName)) {
-                        disjunction.add(PropertyFactoryUtil.forName(PROPERTY_RESOURCE_PRIM_KEY).eq(resourcePrimKey));
-                    }
+                    disjunction.add(PropertyFactoryUtil.forName(PROPERTY_RESOURCE_PRIM_KEY).in(getJournalArticlesResourcePrimKeysByCategories(categoryName)));
+
                     junctionJournalArticle.add(disjunction);
                 }
 
